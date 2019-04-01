@@ -51,39 +51,45 @@
         </repository>
     </distributionManagement>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArguments>
+                        <verbose/>
+                        <bootclasspath>
+                            ${java.home}/jre/lib/rt.jar:${java.home}/jre/lib/jce.jar:${java.home}/lib/tools.jar
+                        </bootclasspath>
+                    </compilerArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <compilerArguments>
+                                <processorpath>com.arsframework.annotation</processorpath>
+                            </compilerArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.0</version>
-                        <configuration>
-                            <source>1.8</source>
-                            <target>1.8</target>
-                            <encoding>UTF-8</encoding>
-                            <compilerArguments>
-                                <verbose/>
-                                <bootclasspath>${java.home}/jre/lib/rt.jar:${java.home}/jre/lib/jce.jar:${java.home}/lib/tools.jar
-                                </bootclasspath>
-                            </compilerArguments>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>default-compile</id>
-                                <goals>
-                                    <goal>compile</goal>
-                                </goals>
-                                <configuration>
-                                    <compilerArguments>
-                                        <processorpath>com.arsframework.annotation</processorpath>
-                                    </compilerArguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -150,6 +156,9 @@
                         </executions>
                         <configuration>
                             <encoding>UTF-8</encoding>
+                            <bootclasspath>
+                                ${java.home}/jre/lib/rt.jar:${java.home}/jre/lib/jce.jar:${java.home}/lib/tools.jar
+                            </bootclasspath>
                         </configuration>
                     </plugin>
                 </plugins>
