@@ -21,9 +21,10 @@ import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 
 /**
+ * 参数断言注解处理器
+ *
  * @author yongqiang.wu
- * @description 参数断言注解处理器
- * @date 2019-03-18 16:14
+ * @version 2019-03-18 16:14
  */
 public class AssertProcessor extends AbstractProcessor {
     private Names names;

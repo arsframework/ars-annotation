@@ -6,9 +6,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * 方法参数非空断言验证注解，该注解可作用于类、方法、参数，参数配置优先使用顺序：参数、方法、类
+ *
  * @author yongqiang.wu
- * @description 方法参数非空断言验证注解，该注解可作用于类、方法、参数，参数配置优先级：参数 > 方法 > 类
- * @date 2019-03-18 16:09
+ * @version 2019-03-18 16:09
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
