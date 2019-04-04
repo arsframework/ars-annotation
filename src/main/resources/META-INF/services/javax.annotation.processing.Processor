@@ -1,1 +1,7 @@
-com.arsframework.annotation.AssertProcessor
+com.arsframework.annotation.processor.AssertProcessor
+com.arsframework.annotation.processor.MaxValidateProcessor
+com.arsframework.annotation.processor.MinValidateProcessor
+com.arsframework.annotation.processor.SizeValidateProcessor
+com.arsframework.annotation.processor.FormatValidateProcessor
+com.arsframework.annotation.processor.NonnullValidateProcessor
+com.arsframework.annotation.processor.NonemptyValidateProcessor

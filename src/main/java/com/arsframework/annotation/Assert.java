@@ -9,8 +9,10 @@ import java.lang.annotation.RetentionPolicy;
  * 方法参数非空断言验证注解，该注解可作用于类、方法、参数，参数配置优先使用顺序：参数、方法、类
  *
  * @author yongqiang.wu
- * @version 2019-03-18 16:09
+ * @see com.arsframework.annotation.Nonnull
+ * @see com.arsframework.annotation.Nonempty
  */
+@Deprecated
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Assert {
@@ -58,16 +60,16 @@ public @interface Assert {
     boolean nonempty() default false;
 
     /**
-     * 参数验证失败异常类型
-     *
-     * @return 异常类型
-     */
-    Class<? extends Throwable> exception() default IllegalArgumentException.class;
-
-    /**
      * 参数验证失败消息，内部采用java.lang.String.format(message,参数名称)方法对消息格式化
      *
      * @return 消息字符串
      */
     String message() default "Argument '%s' must not be empty";
+
+    /**
+     * 参数验证失败异常类型
+     *
+     * @return 异常类型
+     */
+    Class<? extends Throwable> exception() default IllegalArgumentException.class;
 }
