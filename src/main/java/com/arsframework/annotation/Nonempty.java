@@ -18,7 +18,7 @@ public @interface Nonempty {
      *
      * @return 消息字符串
      */
-    String message() default "Argument '%s' must not be empty";
+    String message() default "The value of argument '%s' must not be empty";
 
     /**
      * 参数验证失败异常类型

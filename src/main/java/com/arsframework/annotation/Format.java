@@ -25,7 +25,7 @@ public @interface Format {
      *
      * @return 消息字符串
      */
-    String message() default "Argument '%s' format is not matched for '%s'";
+    String message() default "The format of argument '%s' must be matched for '%s'";
 
     /**
      * 参数验证失败异常类型

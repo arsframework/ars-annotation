@@ -25,7 +25,7 @@ public @interface Min {
      *
      * @return 消息字符串
      */
-    String message() default "Argument '%s' size must not be lt %d";
+    String message() default "The size of argument '%s' must be greater than or equal to %d";
 
     /**
      * 参数验证失败异常类型

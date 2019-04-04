@@ -18,7 +18,7 @@ public @interface Nonnull {
      *
      * @return 消息字符串
      */
-    String message() default "Argument '%s' must not be null";
+    String message() default "The value of argument '%s' must not be null";
 
     /**
      * 参数验证失败异常类型

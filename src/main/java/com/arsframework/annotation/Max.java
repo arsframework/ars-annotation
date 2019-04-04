@@ -25,7 +25,7 @@ public @interface Max {
      *
      * @return 消息字符串
      */
-    String message() default "Argument '%s' size must not be gt %d";
+    String message() default "The size of argument '%s' must be less than or equal to %d";
 
     /**
      * 参数验证失败异常类型
