@@ -61,6 +61,7 @@ public abstract class Validates {
      *
      * @param symbol 代码对象
      * @param type   注解类型
+     * @param <T>    注解类型
      * @return 断言注解对象
      */
     public static <T extends Annotation> T lookupAnnotation(Symbol symbol, Class<T> type) {
