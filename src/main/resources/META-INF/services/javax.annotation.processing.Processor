@@ -10,3 +10,4 @@ com.arsframework.annotation.processor.OptionValidateProcessor
 com.arsframework.annotation.processor.FormatValidateProcessor
 com.arsframework.annotation.processor.NonnullValidateProcessor
 com.arsframework.annotation.processor.NonemptyValidateProcessor
+com.arsframework.annotation.processor.NonblankValidateProcessor

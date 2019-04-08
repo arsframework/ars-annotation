@@ -6,26 +6,19 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 参数值选项注解，适用于数字、枚举、日期类型参数
+ * 参数非空白校验注解，适用于字符串类型参数
  *
  * @author yongqiang.wu
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
-public @interface Option {
+public @interface Nonblank {
     /**
-     * 获取参数选项
-     *
-     * @return 选项数组
-     */
-    long[] value();
-
-    /**
-     * 参数验证失败消息，格式化参数:参数名称、参数选项数组字符串
+     * 参数验证失败消息，格式化参数:参数名称
      *
      * @return 消息字符串
      */
-    String message() default "The value of argument '%s' must be in option %s";
+    String message() default "The value of argument '%s' must not be blank";
 
     /**
      * 参数验证失败异常类型

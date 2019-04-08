@@ -190,6 +190,37 @@ public abstract class Validates {
     }
 
     /**
+     * 构建参数空白验证表达式
+     *
+     * @param maker 语法树构建器
+     * @param names 语法树节点名称对象
+     * @param param 参数代码对象
+     * @return 语法树参数验证表达式对象
+     */
+    public static JCTree.JCExpression buildBlankExpression(TreeMaker maker, Names names, Symbol.VarSymbol param) {
+        if (param.type.isPrimitive() || !isType((Symbol.ClassSymbol) param.type.tsym, String.class)) {
+            return null;
+        }
+        // 非Null验证表达式
+        JCTree.JCExpression condition = buildNullExpression(maker, names, param);
+        return maker.Binary(JCTree.Tag.OR, condition, maker.Apply(
+                List.nil(),
+                maker.Select(
+                        maker.Apply(
+                                List.nil(),
+                                maker.Select(
+                                        maker.Ident(names.fromString(param.name.toString())),
+                                        names.fromString("trim")
+                                ),
+                                List.nil()
+                        ),
+                        names.fromString("isEmpty")
+                ),
+                List.nil()
+        ));
+    }
+
+    /**
      * 构建参数格式验证表达式
      *
      * @param maker   语法树构建器
