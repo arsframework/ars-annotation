@@ -3,7 +3,6 @@ package com.arsframework.annotation.processor;
 import javax.lang.model.type.MirroredTypeException;
 import javax.annotation.processing.SupportedAnnotationTypes;
 
-import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeTag;
@@ -51,8 +50,6 @@ public class AssertProcessor extends AbstractValidateProcessor {
         } catch (MirroredTypeException e) {
             exception = e.getTypeMirror().toString();
         }
-        String message = String.format(annotation.message(), param.name.toString());
-        JCTree.JCExpression exceptionExpression = Validates.buildExceptionExpression(maker, names, exception, message);
-        return maker.If(maker.Parens(binary), maker.Block(0, List.of(maker.Throw(exceptionExpression))), null);
+        return Validates.buildValidateException(maker, names, param, binary, exception, annotation.message(), param.name.toString());
     }
 }

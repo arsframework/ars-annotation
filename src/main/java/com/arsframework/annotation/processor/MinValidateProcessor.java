@@ -17,9 +17,8 @@ public class MinValidateProcessor extends AbstractValidateProcessor {
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
         Min min = Validates.lookupAnnotation(param, Min.class);
-        JCTree.JCExpression expression = Validates.buildMinExpression(maker, names, param, min.value());
-        return expression == null ? null : maker.If(expression,
-                maker.Throw(Validates.buildExceptionExpression(maker, names, min.exception(),
-                        String.format(min.message(), param.name.toString(), min.value()))), null);
+        JCTree.JCExpression condition = Validates.buildMinExpression(maker, names, param, min.value());
+        return Validates.buildValidateException(maker, names, param, condition, min.exception(), min.message(),
+                param.name.toString(), min.value());
     }
 }

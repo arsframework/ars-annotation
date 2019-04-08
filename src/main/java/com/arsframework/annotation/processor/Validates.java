@@ -2,6 +2,7 @@ package com.arsframework.annotation.processor;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.Date;
 import java.util.Collection;
 import java.lang.annotation.Annotation;
 
@@ -14,6 +15,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
+import com.arsframework.annotation.Global;
 
 /**
  * 参数校验注解处理工具类
@@ -253,6 +255,18 @@ public abstract class Validates {
     private static JCTree.JCExpression buildCompareBasisExpression(TreeMaker maker, Names names, Symbol.VarSymbol param) {
         if (isNumber((Symbol.ClassSymbol) param.type.tsym)) { // 数字
             return maker.Ident(names.fromString(param.name.toString()));
+        } else if (isType((Symbol.ClassSymbol) param.type.tsym, Enum.class)) { // 枚举
+            return maker.Apply(
+                    List.nil(),
+                    maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString("ordinal")),
+                    List.nil()
+            );
+        } else if (isType((Symbol.ClassSymbol) param.type.tsym, Date.class)) { // 日期
+            return maker.Apply(
+                    List.nil(),
+                    maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString("getTime")),
+                    List.nil()
+            );
         } else if (isType((Symbol.ClassSymbol) param.type.tsym, CharSequence.class)) { // 字符序列
             return maker.Apply(
                     List.nil(),
@@ -364,12 +378,19 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildOptionExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, long[] options) {
-        if (options.length == 0 || !isNumber((Symbol.ClassSymbol) param.type.tsym)) {
+        boolean isNumber, isEnum = false;
+        if (options.length == 0 || (!(isNumber = isNumber((Symbol.ClassSymbol) param.type.tsym))
+                && !(isEnum = isType((Symbol.ClassSymbol) param.type.tsym, Enum.class))
+                && !isType((Symbol.ClassSymbol) param.type.tsym, Date.class))) {
             return null;
         }
 
         // 构建校验条件表达式
-        JCTree.JCIdent basis = maker.Ident(names.fromString(param.name.toString()));
+        JCTree.JCExpression basis = isNumber ? maker.Ident(names.fromString(param.name.toString())) : maker.Apply(
+                List.nil(),
+                maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString(isEnum ? "ordinal" : "getTime")),
+                List.nil()
+        );
         JCTree.JCExpression condition = maker.Binary(JCTree.Tag.NE, basis, maker.Literal(TypeTag.LONG, options[0]));
         if (options.length > 1) {
             for (int i = 1; i < options.length; i++) {
@@ -549,5 +570,30 @@ public abstract class Validates {
         }
         JCTree.JCExpression nonnull = buildNonnullExpression(maker, names, param, argument);
         return nonnull == null ? condition : maker.Binary(JCTree.Tag.AND, nonnull, condition);
+    }
+
+
+    /**
+     * 构建验证异常块
+     *
+     * @param maker     语法树构建器
+     * @param names     语法树节点名称对象
+     * @param param     参数代码对象
+     * @param condition 校验条件表达式
+     * @param exception 异常类名称
+     * @param message   异常信息
+     * @param args      异常信息参数
+     * @return 校验条件判断代码对象
+     */
+    public static JCTree.JCIf buildValidateException(TreeMaker maker, Names names, Symbol.VarSymbol param,
+                                                     JCTree.JCExpression condition, String exception, String message, Object... args) {
+        if (condition == null) {
+            return null;
+        }
+        Global global;
+        if (Global.DEFAULT_ARGUMENT_EXCEPTION.equals(exception) && (global = lookupAnnotation(param.owner, Global.class)) != null) {
+            exception = global.exception();
+        }
+        return maker.If(condition, maker.Throw(buildExceptionExpression(maker, names, exception, String.format(message, args))), null);
     }
 }

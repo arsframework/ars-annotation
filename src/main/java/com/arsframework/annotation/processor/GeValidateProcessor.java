@@ -17,9 +17,8 @@ public class GeValidateProcessor extends AbstractValidateProcessor {
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
         Ge ge = Validates.lookupAnnotation(param, Ge.class);
-        JCTree.JCExpression expression = Validates.buildGeExpression(maker, names, param, ge.value());
-        return expression == null ? null : maker.If(expression,
-                maker.Throw(Validates.buildExceptionExpression(maker, names, ge.exception(),
-                        String.format(ge.message(), param.name.toString(), ge.value()))), null);
+        JCTree.JCExpression condition = Validates.buildGeExpression(maker, names, param, ge.value());
+        return Validates.buildValidateException(maker, names, param, condition, ge.exception(), ge.message(),
+                param.name.toString(), ge.value());
     }
 }

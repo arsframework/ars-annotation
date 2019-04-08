@@ -17,9 +17,8 @@ public class FormatValidateProcessor extends AbstractValidateProcessor {
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
         Format format = Validates.lookupAnnotation(param, Format.class);
-        JCTree.JCExpression expression = Validates.buildFormatExpression(maker, names, param, format.value());
-        return expression == null ? null : maker.If(expression,
-                maker.Throw(Validates.buildExceptionExpression(maker, names, format.exception(),
-                        String.format(format.message(), param.name.toString(), format.value()))), null);
+        JCTree.JCExpression condition = Validates.buildFormatExpression(maker, names, param, format.value());
+        return Validates.buildValidateException(maker, names, param, condition, format.exception(), format.message(),
+                param.name.toString(), format.value());
     }
 }

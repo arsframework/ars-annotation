@@ -32,5 +32,5 @@ public @interface Format {
      *
      * @return 异常类型
      */
-    String exception() default "java.lang.IllegalArgumentException";
+    String exception() default Global.DEFAULT_ARGUMENT_EXCEPTION;
 }

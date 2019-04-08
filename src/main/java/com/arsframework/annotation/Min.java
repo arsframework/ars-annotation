@@ -6,7 +6,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 参数最小值校验表达式
+ * 参数最小值校验表达式，适用于数字、枚举、日期、字符序列、数组、字典、集合、列表类型参数
  *
  * @author yongqiang.wu
  */
@@ -32,5 +32,5 @@ public @interface Min {
      *
      * @return 异常类型
      */
-    String exception() default "java.lang.IllegalArgumentException";
+    String exception() default Global.DEFAULT_ARGUMENT_EXCEPTION;
 }

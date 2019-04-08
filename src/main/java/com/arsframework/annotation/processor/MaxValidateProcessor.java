@@ -17,9 +17,8 @@ public class MaxValidateProcessor extends AbstractValidateProcessor {
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
         Max max = Validates.lookupAnnotation(param, Max.class);
-        JCTree.JCExpression expression = Validates.buildMaxExpression(maker, names, param, max.value());
-        return expression == null ? null : maker.If(expression,
-                maker.Throw(Validates.buildExceptionExpression(maker, names, max.exception(),
-                        String.format(max.message(), param.name.toString(), max.value()))), null);
+        JCTree.JCExpression condition = Validates.buildMaxExpression(maker, names, param, max.value());
+        return Validates.buildValidateException(maker, names, param, condition, max.exception(), max.message(),
+                param.name.toString(), max.value());
     }
 }

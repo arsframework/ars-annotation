@@ -17,9 +17,8 @@ public class NonemptyValidateProcessor extends AbstractValidateProcessor {
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
         Nonempty nonempty = Validates.lookupAnnotation(param, Nonempty.class);
-        JCTree.JCExpression expression = Validates.buildEmptyExpression(maker, names, param);
-        return expression == null ? null : maker.If(expression, maker.Throw(
-                Validates.buildExceptionExpression(maker, names, nonempty.exception(),
-                        String.format(nonempty.message(), param.name.toString()))), null);
+        JCTree.JCExpression condition = Validates.buildEmptyExpression(maker, names, param);
+        return Validates.buildValidateException(maker, names, param, condition, nonempty.exception(), nonempty.message(),
+                param.name.toString());
     }
 }

@@ -6,7 +6,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 参数值选项注解，适用于数字类型参数
+ * 参数值选项注解，适用于数字、枚举、日期类型参数
  *
  * @author yongqiang.wu
  */
@@ -32,5 +32,5 @@ public @interface Option {
      *
      * @return 异常类型
      */
-    String exception() default "java.lang.IllegalArgumentException";
+    String exception() default Global.DEFAULT_ARGUMENT_EXCEPTION;
 }
