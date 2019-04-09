@@ -6,7 +6,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 参数格式校验注解，适用于所有类型参数
+ * 参数格式校验注解，适用于数字、字符串类型参数
  *
  * @author yongqiang.wu
  */

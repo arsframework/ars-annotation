@@ -39,7 +39,7 @@ public class AssertProcessor extends AbstractValidateProcessor {
 
         // 验证空白
         JCTree.JCExpression emptyExpression;
-        if (nonempty && (emptyExpression = Validates.buildEmptyExpression(maker, names, param)) != null) {
+        if (nonempty && (emptyExpression = Validates.buildEmptyExpression(maker, names, param, true)) != null) {
             binary = maker.Binary(nonnull ? JCTree.Tag.OR : JCTree.Tag.AND, binary, emptyExpression);
         }
 

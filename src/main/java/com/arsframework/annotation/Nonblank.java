@@ -9,7 +9,9 @@ import java.lang.annotation.RetentionPolicy;
  * 参数非空白校验注解，适用于字符串类型参数
  *
  * @author yongqiang.wu
+ * @see com.arsframework.annotation.Nonempty
  */
+@Deprecated
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Nonblank {

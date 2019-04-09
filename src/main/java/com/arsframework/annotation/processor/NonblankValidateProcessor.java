@@ -11,6 +11,7 @@ import com.arsframework.annotation.Nonblank;
  *
  * @author yongqiang.wu
  */
+@Deprecated
 @SupportedAnnotationTypes("com.arsframework.annotation.Nonblank")
 public class NonblankValidateProcessor extends AbstractValidateProcessor {
 

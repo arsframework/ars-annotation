@@ -14,6 +14,13 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Nonempty {
     /**
+     * 针对字符串参数是否允许空白
+     *
+     * @return true/false
+     */
+    boolean blank() default true;
+
+    /**
      * 参数验证失败消息，格式化参数:参数名称
      *
      * @return 消息字符串
