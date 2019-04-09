@@ -62,7 +62,8 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
                             this.buildValidateBlock((Symbol.MethodSymbol) element);
                         }
                     } else if (element.getKind() == ElementKind.PARAMETER) { // 参数元素
-                        if (((Symbol.VarSymbol) element).owner.getAnnotation(annotation) == null) {
+                        if (((Symbol.VarSymbol) element).owner.getAnnotation(annotation) == null
+                                && ((Symbol.VarSymbol) element).owner.owner.getAnnotation(annotation) == null) {
                             this.buildValidateBlock((Symbol.VarSymbol) element);
                         }
                     }

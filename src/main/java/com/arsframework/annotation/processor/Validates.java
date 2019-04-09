@@ -383,7 +383,8 @@ public abstract class Validates {
         JCTree.JCExpression basis = null;
         if (isType((Symbol.ClassSymbol) param.type.tsym, String.class)) {
             basis = maker.Ident(names.fromString(param.name.toString()));
-        } else if (isNumber((Symbol.ClassSymbol) param.type.tsym) || isType((Symbol.ClassSymbol) param.type.tsym, CharSequence.class)) {
+        } else if (isNumber((Symbol.ClassSymbol) param.type.tsym)
+                || isType((Symbol.ClassSymbol) param.type.tsym, Number.class, CharSequence.class)) {
             if (param.type.isPrimitive()) {
                 basis = maker.Apply(
                         List.nil(),
