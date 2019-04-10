@@ -1,6 +1,7 @@
 package com.arsframework.annotation.processor;
 
 import java.util.Set;
+import java.util.Iterator;
 import java.lang.annotation.Annotation;
 
 import javax.lang.model.SourceVersion;
@@ -14,6 +15,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.ListBuffer;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeMaker;
@@ -57,15 +59,12 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
                                 this.buildValidateBlock(((JCTree.JCMethodDecl) def).sym);
                             }
                         }
-                    } else if (element.getKind() == ElementKind.CONSTRUCTOR || element.getKind() == ElementKind.METHOD) { // 方法元素
-                        if (((Symbol.MethodSymbol) element).owner.getAnnotation(annotation) == null) {
-                            this.buildValidateBlock((Symbol.MethodSymbol) element);
-                        }
-                    } else if (element.getKind() == ElementKind.PARAMETER) { // 参数元素
-                        if (((Symbol.VarSymbol) element).owner.getAnnotation(annotation) == null
-                                && ((Symbol.VarSymbol) element).owner.owner.getAnnotation(annotation) == null) {
-                            this.buildValidateBlock((Symbol.VarSymbol) element);
-                        }
+                    } else if ((element.getKind() == ElementKind.CONSTRUCTOR || element.getKind() == ElementKind.METHOD)
+                            && Validates.lookupAnnotation(((Symbol) element).owner, annotation) == null) { // 方法元素
+                        this.buildValidateBlock((Symbol.MethodSymbol) element);
+                    } else if (element.getKind() == ElementKind.PARAMETER
+                            && Validates.lookupAnnotation(((Symbol) element).owner, annotation) == null) { // 参数元素
+                        this.buildValidateBlock((Symbol.VarSymbol) element);
                     }
                 }
             } catch (ClassNotFoundException e) {
@@ -81,10 +80,9 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
      * @param param 参数代码对象
      */
     protected void buildValidateBlock(Symbol.VarSymbol param) {
-        JCTree.JCIf condition = this.buildValidateCondition(param);
+        JCTree.JCStatement condition = this.buildValidateCondition(param);
         if (condition != null) {
-            JCTree.JCMethodDecl tree = (JCTree.JCMethodDecl) trees.getTree(param.owner);
-            tree.body.stats = tree.body.stats.prepend(condition);
+            this.appendValidateBlock(((JCTree.JCMethodDecl) trees.getTree(param.owner)).body, condition);
         }
     }
 
@@ -97,12 +95,37 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
         if (method != null && method.params != null && !method.params.isEmpty()) {
             JCTree.JCMethodDecl tree = trees.getTree(method);
             for (Symbol.VarSymbol param : method.params) {
-                JCTree.JCStatement condition = this.buildValidateCondition(param);
-                if (condition != null) {
-                    tree.body.stats = tree.body.stats.prepend(condition);
-                }
+                this.appendValidateBlock(tree.body, this.buildValidateCondition(param));
             }
         }
+    }
+
+    /**
+     * 添加参数校验代码块
+     *
+     * @param body      方法体代码对象
+     * @param condition 验证条件表达式对象
+     */
+    protected void appendValidateBlock(JCTree.JCBlock body, JCTree.JCStatement condition) {
+        if (condition == null) {
+            return;
+        }
+        // 判断方法体第一行是否为构造方法调用（super、this），如果是则将校验代码块追加到构造方法调用后面，否则添加到方法体最前面
+        if (body.stats.head instanceof JCTree.JCExpressionStatement) {
+            JCTree.JCExpression expression = ((JCTree.JCExpressionStatement) body.stats.head).expr;
+            if (expression instanceof JCTree.JCMethodInvocation
+                    && ((JCTree.JCMethodInvocation) expression).meth.getKind() == Tree.Kind.IDENTIFIER) {
+                ListBuffer stats = ListBuffer.of(body.stats.head).append(condition);
+                Iterator<JCTree.JCStatement> iterator = body.stats.iterator();
+                iterator.next(); // 过滤第一行构造方法调用
+                while (iterator.hasNext()) {
+                    stats.append(iterator.next());
+                }
+                body.stats = stats.toList(); // 重置方法体代码块
+                return;
+            }
+        }
+        body.stats = body.stats.prepend(condition); // 将参数校验条件表达式添加到方法代码块最前面
     }
 
     /**

@@ -14,6 +14,11 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Ge {
     /**
+     * 默认异常信息
+     */
+    String DEFAULT_EXCEPTION_MESSAGE = "The value of argument '%s' must be greater than or equal to argument '%s'";
+
+    /**
      * 获取被比较参数名称
      *
      * @return 参数名称
@@ -25,7 +30,7 @@ public @interface Ge {
      *
      * @return 消息字符串
      */
-    String message() default "The value of argument '%s' must be greater than or equal to argument '%s'";
+    String message() default DEFAULT_EXCEPTION_MESSAGE;
 
     /**
      * 参数验证失败异常类型

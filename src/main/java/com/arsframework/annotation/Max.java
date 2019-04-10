@@ -14,6 +14,11 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Max {
     /**
+     * 默认异常信息
+     */
+    String DEFAULT_EXCEPTION_MESSAGE = "The size of argument '%s' must be less than or equal to %d";
+
+    /**
      * 获取参数最大值
      *
      * @return 最大值
@@ -25,7 +30,7 @@ public @interface Max {
      *
      * @return 消息字符串
      */
-    String message() default "The size of argument '%s' must be less than or equal to %d";
+    String message() default DEFAULT_EXCEPTION_MESSAGE;
 
     /**
      * 参数验证失败异常类型

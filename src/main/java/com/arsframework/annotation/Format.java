@@ -14,6 +14,11 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Format {
     /**
+     * 默认异常信息
+     */
+    String DEFAULT_EXCEPTION_MESSAGE = "The format of argument '%s' must be matched for '%s'";
+
+    /**
      * 获取参数匹配格式（正则表达式）
      *
      * @return 匹配格式
@@ -25,7 +30,7 @@ public @interface Format {
      *
      * @return 消息字符串
      */
-    String message() default "The format of argument '%s' must be matched for '%s'";
+    String message() default DEFAULT_EXCEPTION_MESSAGE;
 
     /**
      * 参数验证失败异常类型

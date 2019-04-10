@@ -14,6 +14,11 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Size {
     /**
+     * 默认异常信息
+     */
+    String DEFAULT_EXCEPTION_MESSAGE = "The size of argument '%s' must be in interval [%d, %d]";
+
+    /**
      * 获取参数最小值
      *
      * @return 最小值
@@ -32,7 +37,7 @@ public @interface Size {
      *
      * @return 消息字符串
      */
-    String message() default "The size of argument '%s' must be in interval [%d, %d]";
+    String message() default DEFAULT_EXCEPTION_MESSAGE;
 
     /**
      * 参数验证失败异常类型

@@ -17,6 +17,11 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Assert {
     /**
+     * 默认异常信息
+     */
+    String DEFAULT_EXCEPTION_MESSAGE = "Argument '%s' must not be empty";
+
+    /**
      * 针对类注解的方法搜索范围枚举
      */
     enum Scope {
@@ -64,7 +69,7 @@ public @interface Assert {
      *
      * @return 消息字符串
      */
-    String message() default "Argument '%s' must not be empty";
+    String message() default DEFAULT_EXCEPTION_MESSAGE;
 
     /**
      * 参数验证失败异常类型
