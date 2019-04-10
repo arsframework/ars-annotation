@@ -11,7 +11,7 @@ JDK1.8+
 <dependency>
     <groupId>com.arsframework</groupId>
     <artifactId>ars-annotation</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.4</version>
 </dependency>
 ```
 
