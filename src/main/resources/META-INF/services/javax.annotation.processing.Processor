@@ -1,4 +1,3 @@
-com.arsframework.annotation.processor.AssertProcessor
 com.arsframework.annotation.processor.GtValidateProcessor
 com.arsframework.annotation.processor.GeValidateProcessor
 com.arsframework.annotation.processor.LtValidateProcessor
@@ -10,4 +9,3 @@ com.arsframework.annotation.processor.OptionValidateProcessor
 com.arsframework.annotation.processor.FormatValidateProcessor
 com.arsframework.annotation.processor.NonnullValidateProcessor
 com.arsframework.annotation.processor.NonemptyValidateProcessor
-com.arsframework.annotation.processor.NonblankValidateProcessor

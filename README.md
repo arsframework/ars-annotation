@@ -11,7 +11,7 @@ JDK1.8+
 <dependency>
     <groupId>com.arsframework</groupId>
     <artifactId>ars-annotation</artifactId>
-    <version>1.3.4</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -31,14 +31,14 @@ JDK1.8+
 参数校验注解的配置优先于全局注解的配置，即如果参数校验注解配置发生改变则使用参数校验注解配置，否则使用全局注解配置（如果没有全局注解则使用参数校验注解配置）。
 
 #### 3.1.1 注解方法
-- ```String exception()```方法统一设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法统一设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.1.2 示例
 ```
 import com.arsframework.annotation.*;
 
 @Format("1")
-@Global(exception = "java.lang.IllegalStateException")
+@Global(exception = IllegalStateException.class)
 public class Test {
     /**
      * @param s 使用java.lang.IllegalStateException
@@ -49,14 +49,14 @@ public class Test {
     /**
      * @param s 使用java.lang.RuntimeException
      */
-    @Global(exception = "java.lang.RuntimeException")
+    @Global(exception = RuntimeException.class)
     public static void b(String s) {
     }
 
     /**
      * @param s 使用java.lang.RuntimeException
      */
-    public static void c(@Format(value = "z", exception = "java.lang.RuntimeException") String s) {
+    public static void c(@Format(value = "z", exception = RuntimeException.class) String s) {
     }
 }
 ```
@@ -67,7 +67,7 @@ public class Test {
 #### 3.2.1 注解方法
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must not be null```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.2.2 示例
 ```
@@ -91,7 +91,7 @@ public class Test {
 - ```boolean blank()```方法设置```java.lang.CharSequence```类型参数是否允许空白，默认为```true```。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must not be empty```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.3.2 示例
 ```
@@ -123,7 +123,7 @@ public class Test {
 - ```String value()```方法设置数据格式匹配模式（正则表达式）。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 匹配模式)```的方式对其进行格式化，
 默认为```The format of argument '%s' must be matched for '%s'```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.4.2 示例
 ```
@@ -157,7 +157,7 @@ public class Test {
 - ```long value()```方法设置参数最小值。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最小值)```的方式对其进行格式化，
 默认为```The size of argument '%s' must be greater than or equal to %d```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.5.2 示例
 ```
@@ -187,7 +187,7 @@ public class Test {
 - ```long value()```方法设置参数最大值。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最大值)```的方式对其进行格式化，
 默认为```The size of argument '%s' must be less than or equal to %d```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.6.2 示例
 ```
@@ -218,7 +218,7 @@ public class Test {
 - ```long max()```方法设置参数最大值，默认为```Long.MAX_VALUE```。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最小值、参数最大值)```的方式对其进行格式化，
 默认为```The size of argument '%s' must be in interval [%d, %d]```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.7.2 示例
 ```
@@ -248,7 +248,7 @@ public class Test {
 - ```long[] value()```方法设置参数值选项数组，如果参数值选项数组为空则自动忽略该注解。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数选项数组字符串)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be in option %s```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.8.2 示例
 ```
@@ -276,7 +276,7 @@ public class Test {
 - ```String value()```方法设置被比较参数名称。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be less than argument '%s'```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.9.2 示例
 ```
@@ -302,7 +302,7 @@ public class Test {
 - ```String value()```方法设置被比较参数名称。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be less than or equal to argument '%s'```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.10.2 示例
 ```
@@ -328,7 +328,7 @@ public class Test {
 - ```String value()```方法设置被比较参数名称。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be greater than argument '%s'```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.11.2 示例
 ```
@@ -354,7 +354,7 @@ public class Test {
 - ```String value()```方法设置被比较参数名称。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be greater than or equal to argument '%s'```。
-- ```String exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
 
 #### 3.12.2 示例
 ```
@@ -372,12 +372,6 @@ public class Test {
 }
 ```
 
-### 3.13 @Assert 注解
-该注解已不建议使用，请参考```@Nonnull```、```@Nonempty```注解。
-
-### 3.14 @Nonblank 注解
-该注解已不建议使用，请参考```@Nonempty```注解。
-
 ## 4 版本更新日志
 ### v1.3.2
 1. 修复重复校验问题
@@ -389,3 +383,7 @@ public class Test {
 ### v1.3.4
 1. 为注解异常信息提供默认静态常量值
 2. 修复注解作用于包含```super()```、```this()```调用的构造方法时编译失败的问题
+
+### v1.4.0
+1. 将注解```exception()```方法返回类型由```java.lang.String```调整为```java.lang.Class```
+2. 移除```@Assert```、```@Nonblank```注解

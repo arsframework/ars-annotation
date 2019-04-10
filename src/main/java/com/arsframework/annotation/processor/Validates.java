@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.lang.annotation.Annotation;
 
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.MirroredTypeException;
 
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Names;
@@ -201,20 +202,6 @@ public abstract class Validates {
     }
 
     /**
-     * 构建异常类对象
-     *
-     * @param maker   语法树构建器
-     * @param names   语法树节点名称对象
-     * @param type    异常类型
-     * @param message 异常消息
-     * @return 语法树类对象
-     */
-    @Deprecated
-    public static JCTree.JCNewClass buildExceptionExpression(TreeMaker maker, Names names, String type, String message) {
-        return buildClassExpression(maker, names, type, message);
-    }
-
-    /**
      * 构建Null校验条件表达式
      *
      * @param maker 语法树构建器
@@ -336,37 +323,6 @@ public abstract class Validates {
                     ));
         }
         return condition;
-    }
-
-    /**
-     * 构建参数空白验证表达式
-     *
-     * @param maker 语法树构建器
-     * @param names 语法树节点名称对象
-     * @param param 参数代码对象
-     * @return 语法树参数验证表达式对象
-     */
-    @Deprecated
-    public static JCTree.JCExpression buildBlankExpression(TreeMaker maker, Names names, Symbol.VarSymbol param) {
-        if (param.type.isPrimitive() || !isType((Symbol.ClassSymbol) param.type.tsym, String.class)) {
-            return null;
-        }
-        // 格式校验条件表达式
-        return maker.Binary(JCTree.Tag.OR, buildNullExpression(maker, names, param), maker.Apply(
-                List.nil(),
-                maker.Select(
-                        maker.Apply(
-                                List.nil(),
-                                maker.Select(
-                                        maker.Ident(names.fromString(param.name.toString())),
-                                        names.fromString("trim")
-                                ),
-                                List.nil()
-                        ),
-                        names.fromString("isEmpty")
-                ),
-                List.nil()
-        ));
     }
 
     /**
@@ -702,8 +658,13 @@ public abstract class Validates {
             return null;
         }
         Global global;
-        if (Global.DEFAULT_ARGUMENT_EXCEPTION.equals(exception) && (global = lookupAnnotation(param.owner, Global.class)) != null) {
-            exception = global.exception();
+        if ((global = lookupAnnotation(param.owner, Global.class)) != null
+                && IllegalArgumentException.class.getCanonicalName().equals(exception)) {
+            try {
+                exception = global.exception().getCanonicalName();
+            } catch (MirroredTypeException e) {
+                exception = e.getTypeMirror().toString();
+            }
         }
         return maker.If(condition, maker.Throw(buildClassExpression(maker, names, exception, String.format(message, args))), null);
     }

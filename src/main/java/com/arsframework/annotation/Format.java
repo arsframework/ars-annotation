@@ -37,5 +37,5 @@ public @interface Format {
      *
      * @return 异常类型
      */
-    String exception() default Global.DEFAULT_ARGUMENT_EXCEPTION;
+    Class<? extends Throwable> exception() default IllegalArgumentException.class;
 }

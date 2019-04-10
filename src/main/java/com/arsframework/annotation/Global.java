@@ -14,14 +14,9 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD})
 public @interface Global {
     /**
-     * 默认参数异常类
-     */
-    String DEFAULT_ARGUMENT_EXCEPTION = "java.lang.IllegalArgumentException";
-
-    /**
      * 参数验证失败异常类型
      *
      * @return 异常类型
      */
-    String exception() default DEFAULT_ARGUMENT_EXCEPTION;
+    Class<? extends Throwable> exception() default IllegalArgumentException.class;
 }
