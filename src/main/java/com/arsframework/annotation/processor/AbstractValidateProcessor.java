@@ -94,7 +94,7 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
      * @param method 方法代码对象
      */
     protected void buildValidateBlock(Symbol.MethodSymbol method) {
-        if (!method.params.isEmpty()) {
+        if (method != null && method.params != null && !method.params.isEmpty()) {
             JCTree.JCMethodDecl tree = trees.getTree(method);
             for (Symbol.VarSymbol param : method.params) {
                 JCTree.JCStatement condition = this.buildValidateCondition(param);
