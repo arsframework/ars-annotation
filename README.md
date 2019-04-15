@@ -374,12 +374,40 @@ public class Test {
 ```
 
 ### 3.13 @Ignore 注解
-该注解用于忽略参数校验注解。
+该注解用于忽略参数校验注解，且优先级高于其他参数校验注解。
 
 #### 3.13.1 注解方法
 无
 
 #### 3.13.2 示例
+```
+import com.arsframework.annotation.*;
+
+@Nonnull
+public class Test {
+    /**
+     * @param s 生效
+     * @param n 生效
+     */
+    public static void a(String s, Integer n) {
+    }
+
+    /**
+     * @param s 忽略
+     * @param n 忽略
+     */
+    @Ignore
+    public static void b(String s, Integer n) {
+    }
+
+    /**
+     * @param s 生效
+     * @param n 忽略
+     */
+    public static void c(String s, @Ignore Integer n) {
+    }
+}
+```
 
 ## 4 版本更新日志
 ### v1.3.2
@@ -396,3 +424,7 @@ public class Test {
 ### v1.4.0
 1. 将注解```exception()```方法返回类型由```java.lang.String```调整为```java.lang.Class```
 2. 移除```@Assert```、```@Nonblank```注解
+
+### v1.4.1
+1. 修复当方法体中存在静态方法调用时参数校验逻辑块顺序错误问题
+2. 新增```@Ignore```注解
