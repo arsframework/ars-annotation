@@ -22,6 +22,8 @@ import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 
+import com.arsframework.annotation.Ignore;
+
 /**
  * 参数校验注解处理器抽象实现
  *
@@ -80,10 +82,7 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
      * @param param 参数代码对象
      */
     protected void buildValidateBlock(Symbol.VarSymbol param) {
-        JCTree.JCStatement condition = this.buildValidateCondition(param);
-        if (condition != null) {
-            this.appendValidateBlock(((JCTree.JCMethodDecl) trees.getTree(param.owner)).body, condition);
-        }
+        this.appendValidateBlock(((JCTree.JCMethodDecl) trees.getTree(param.owner)).body, param);
     }
 
     /**
@@ -93,9 +92,9 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
      */
     protected void buildValidateBlock(Symbol.MethodSymbol method) {
         if (method != null && method.params != null && !method.params.isEmpty()) {
-            JCTree.JCMethodDecl tree = trees.getTree(method);
+            JCTree.JCBlock body = trees.getTree(method).body;
             for (Symbol.VarSymbol param : method.params) {
-                this.appendValidateBlock(tree.body, this.buildValidateCondition(param));
+                this.appendValidateBlock(body, param);
             }
         }
     }
@@ -103,15 +102,23 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
     /**
      * 添加参数校验代码块
      *
-     * @param body      方法体代码对象
-     * @param condition 验证条件表达式对象
+     * @param body  方法体代码对象
+     * @param param 参数代码对象
      */
-    protected void appendValidateBlock(JCTree.JCBlock body, JCTree.JCStatement condition) {
+    private void appendValidateBlock(JCTree.JCBlock body, Symbol.VarSymbol param) {
+        // 如果存在@Ignore注解，则忽略参数校验注解
+        if (Validates.lookupAnnotation(param, Ignore.class) != null) {
+            return;
+        }
+
+        // 构建参数校验逻辑条件
+        JCTree.JCStatement condition = this.buildValidateCondition(param);
         if (condition == null) {
             return;
         }
+
         // 判断方法体第一行是否为构造方法调用（super、this），如果是则将校验代码块追加到构造方法调用后面，否则添加到方法体最前面
-        if (body.stats.head instanceof JCTree.JCExpressionStatement) {
+        if (param.owner.getKind() == ElementKind.CONSTRUCTOR && body.stats.head instanceof JCTree.JCExpressionStatement) {
             JCTree.JCExpression expression = ((JCTree.JCExpressionStatement) body.stats.head).expr;
             if (expression instanceof JCTree.JCMethodInvocation
                     && ((JCTree.JCMethodInvocation) expression).meth.getKind() == Tree.Kind.IDENTIFIER) {

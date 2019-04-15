@@ -11,7 +11,7 @@ JDK1.8+
 <dependency>
     <groupId>com.arsframework</groupId>
     <artifactId>ars-annotation</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
 </dependency>
 ```
 
@@ -372,6 +372,14 @@ public class Test {
     }
 }
 ```
+
+### 3.13 @Ignore 注解
+该注解用于忽略参数校验注解。
+
+#### 3.13.1 注解方法
+无
+
+#### 3.13.2 示例
 
 ## 4 版本更新日志
 ### v1.3.2
