@@ -30,6 +30,9 @@ public class LeValidateProcessor extends AbstractValidateProcessor {
 
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
+        if (this.isIgnoreAnnotation(param, Le.class)) {
+            return null;
+        }
         Le le = Validates.lookupAnnotation(param, Le.class);
         JCTree.JCExpression condition = Validates.buildLeExpression(maker, names, param, le.value());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(le), le.message(),

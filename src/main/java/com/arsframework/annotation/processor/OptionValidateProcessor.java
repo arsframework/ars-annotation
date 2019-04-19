@@ -32,6 +32,9 @@ public class OptionValidateProcessor extends AbstractValidateProcessor {
 
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
+        if (this.isIgnoreAnnotation(param, Option.class)) {
+            return null;
+        }
         Option option = Validates.lookupAnnotation(param, Option.class);
         JCTree.JCExpression condition = Validates.buildOptionExpression(maker, names, param, option.value());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(option), option.message(),

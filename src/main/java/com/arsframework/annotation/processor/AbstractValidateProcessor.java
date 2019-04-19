@@ -1,6 +1,7 @@
 package com.arsframework.annotation.processor;
 
 import java.util.Set;
+import java.util.List;
 import java.util.Iterator;
 import java.lang.annotation.Annotation;
 
@@ -8,6 +9,8 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.MirroredTypesException;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -77,6 +80,42 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
     }
 
     /**
+     * 判断注解是否被忽略
+     *
+     * @param param      参数代码对象
+     * @param annotation 注解对象
+     * @return true/false
+     */
+    protected boolean isIgnoreAnnotation(Symbol.VarSymbol param, Class<? extends Annotation> annotation) {
+        Ignore ignore;
+        if (annotation != Ignore.class && (ignore = Validates.lookupAnnotation(param, Ignore.class)) != null) {
+            try {
+                Class<? extends Annotation>[] classes = ignore.value();
+                if (classes.length == 0) {
+                    return true;
+                }
+                for (Class<? extends Annotation> cls : classes) {
+                    if (cls == annotation) {
+                        return true;
+                    }
+                }
+            } catch (MirroredTypesException e) {
+                List<? extends TypeMirror> mirrors = e.getTypeMirrors();
+                if (mirrors.isEmpty()) {
+                    return true;
+                }
+                String name = annotation.getCanonicalName();
+                for (TypeMirror mirror : mirrors) {
+                    if (mirror.toString().equals(name)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * 构建参数校验处理代码块
      *
      * @param param 参数代码对象
@@ -106,11 +145,6 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
      * @param param 参数代码对象
      */
     private void appendValidateBlock(JCTree.JCBlock body, Symbol.VarSymbol param) {
-        // 如果存在@Ignore注解，则忽略参数校验注解
-        if (Validates.lookupAnnotation(param, Ignore.class) != null) {
-            return;
-        }
-
         // 构建参数校验逻辑条件
         JCTree.JCStatement condition = this.buildValidateCondition(param);
         if (condition == null) {

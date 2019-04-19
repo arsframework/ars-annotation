@@ -30,6 +30,9 @@ public class SizeValidateProcessor extends AbstractValidateProcessor {
 
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
+        if (this.isIgnoreAnnotation(param, Size.class)) {
+            return null;
+        }
         Size size = Validates.lookupAnnotation(param, Size.class);
         JCTree.JCExpression condition = Validates.buildSizeExpression(maker, names, param, size.min(), size.max());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(size), size.message(),

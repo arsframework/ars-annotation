@@ -11,7 +11,7 @@ JDK1.8+
 <dependency>
     <groupId>com.arsframework</groupId>
     <artifactId>ars-annotation</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
 </dependency>
 ```
 
@@ -374,10 +374,10 @@ public class Test {
 ```
 
 ### 3.13 @Ignore 注解
-该注解用于忽略参数校验注解，且优先级高于其他参数校验注解。
+该注解用于忽略参数校验注解，且优先级高于其他参数校验注解。如果被忽略注解数组为空，则忽略所有注解；否则忽略指定注解。
 
 #### 3.13.1 注解方法
-无
+- ```Class<? extends Annotation>[] value()```方法设置被忽略的注解类，默认为空数组。
 
 #### 3.13.2 示例
 ```
@@ -428,3 +428,6 @@ public class Test {
 ### v1.4.1
 1. 修复当方法体中存在静态方法调用时参数校验逻辑块顺序错误问题
 2. 新增```@Ignore```注解
+
+### v1.4.2
+1. 在```@Ignore```注解中新增```Class<? extends Annotation>[] value()```方法，用于忽略指定注解。

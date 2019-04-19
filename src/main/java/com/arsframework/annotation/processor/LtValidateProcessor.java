@@ -30,6 +30,9 @@ public class LtValidateProcessor extends AbstractValidateProcessor {
 
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
+        if (this.isIgnoreAnnotation(param, Lt.class)) {
+            return null;
+        }
         Lt lt = Validates.lookupAnnotation(param, Lt.class);
         JCTree.JCExpression condition = Validates.buildLtExpression(maker, names, param, lt.value());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(lt), lt.message(),

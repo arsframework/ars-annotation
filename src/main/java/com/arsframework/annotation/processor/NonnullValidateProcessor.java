@@ -30,6 +30,9 @@ public class NonnullValidateProcessor extends AbstractValidateProcessor {
 
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
+        if (this.isIgnoreAnnotation(param, Nonnull.class)) {
+            return null;
+        }
         Nonnull nonnull = Validates.lookupAnnotation(param, Nonnull.class);
         JCTree.JCExpression condition = Validates.buildNullExpression(maker, names, param);
         return Validates.buildValidateException(maker, names, param, condition, this.getException(nonnull), nonnull.message(),

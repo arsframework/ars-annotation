@@ -30,6 +30,9 @@ public class GtValidateProcessor extends AbstractValidateProcessor {
 
     @Override
     protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
+        if (this.isIgnoreAnnotation(param, Gt.class)) {
+            return null;
+        }
         Gt gt = Validates.lookupAnnotation(param, Gt.class);
         JCTree.JCExpression condition = Validates.buildGtExpression(maker, names, param, gt.value());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(gt), gt.message(),
