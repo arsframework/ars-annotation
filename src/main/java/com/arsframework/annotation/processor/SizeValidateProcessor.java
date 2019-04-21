@@ -1,5 +1,7 @@
 package com.arsframework.annotation.processor;
 
+import java.lang.annotation.Annotation;
+
 import javax.lang.model.type.MirroredTypeException;
 import javax.annotation.processing.SupportedAnnotationTypes;
 
@@ -29,11 +31,8 @@ public class SizeValidateProcessor extends AbstractValidateProcessor {
     }
 
     @Override
-    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
-        if (this.isIgnoreAnnotation(param, Size.class)) {
-            return null;
-        }
-        Size size = Validates.lookupAnnotation(param, Size.class);
+    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param, Class<? extends Annotation> annotation) {
+        Size size = (Size) Validates.lookupAnnotation(param, annotation);
         JCTree.JCExpression condition = Validates.buildSizeExpression(maker, names, param, size.min(), size.max());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(size), size.message(),
                 param.name.toString(), size.min(), size.max());

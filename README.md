@@ -11,7 +11,7 @@ JDK1.8+
 <dependency>
     <groupId>com.arsframework</groupId>
     <artifactId>ars-annotation</artifactId>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
 </dependency>
 ```
 
@@ -433,6 +433,10 @@ public class Test {
 1. 在```@Ignore```注解中新增```Class<? extends Annotation>[] value()```方法，用于忽略指定注解
 
 ### v1.4.3
-1. 修复在构造方法中调用静态方法被识别为构造方法调用的Bug 
-2. 更新```@Lt```、```@Le```、```@Gt```、```@Ge```注解处理逻辑，当注解被比较参数值为空（含空格）时忽略该注解
+1. 调整参数校验顺序与参数声明顺序一致
+2. 修复在构造方法中调用静态方法被识别为构造方法调用的Bug 
+3. 更新```@Lt```、```@Le```、```@Gt```、```@Ge```注解处理逻辑，当注解被比较参数值为空（含空格）时忽略该注解
+
+### v1.4.4
+1. 修复参数校验顺序一致性Bug，取消注解作用于参数时的校验顺序一致性。
 

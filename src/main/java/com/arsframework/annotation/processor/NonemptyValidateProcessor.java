@@ -1,5 +1,7 @@
 package com.arsframework.annotation.processor;
 
+import java.lang.annotation.Annotation;
+
 import javax.lang.model.type.MirroredTypeException;
 import javax.annotation.processing.SupportedAnnotationTypes;
 
@@ -29,11 +31,8 @@ public class NonemptyValidateProcessor extends AbstractValidateProcessor {
     }
 
     @Override
-    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
-        if (this.isIgnoreAnnotation(param, Nonempty.class)) {
-            return null;
-        }
-        Nonempty nonempty = Validates.lookupAnnotation(param, Nonempty.class);
+    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param, Class<? extends Annotation> annotation) {
+        Nonempty nonempty = (Nonempty) Validates.lookupAnnotation(param, annotation);
         JCTree.JCExpression condition = Validates.buildEmptyExpression(maker, names, param, nonempty.blank());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(nonempty), nonempty.message(),
                 param.name.toString());

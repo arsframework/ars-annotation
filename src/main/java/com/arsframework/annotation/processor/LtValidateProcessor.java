@@ -1,5 +1,7 @@
 package com.arsframework.annotation.processor;
 
+import java.lang.annotation.Annotation;
+
 import javax.lang.model.type.MirroredTypeException;
 import javax.annotation.processing.SupportedAnnotationTypes;
 
@@ -29,11 +31,8 @@ public class LtValidateProcessor extends AbstractValidateProcessor {
     }
 
     @Override
-    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
-        if (this.isIgnoreAnnotation(param, Lt.class)) {
-            return null;
-        }
-        Lt lt = Validates.lookupAnnotation(param, Lt.class);
+    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param, Class<? extends Annotation> annotation) {
+        Lt lt = (Lt) Validates.lookupAnnotation(param, annotation);
         JCTree.JCExpression condition = Validates.buildLtExpression(maker, names, param, lt.value());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(lt), lt.message(),
                 param.name.toString(), lt.value());

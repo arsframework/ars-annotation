@@ -1,5 +1,7 @@
 package com.arsframework.annotation.processor;
 
+import java.lang.annotation.Annotation;
+
 import javax.lang.model.type.MirroredTypeException;
 import javax.annotation.processing.SupportedAnnotationTypes;
 
@@ -29,11 +31,8 @@ public class MinValidateProcessor extends AbstractValidateProcessor {
     }
 
     @Override
-    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param) {
-        if (this.isIgnoreAnnotation(param, Min.class)) {
-            return null;
-        }
-        Min min = Validates.lookupAnnotation(param, Min.class);
+    protected JCTree.JCIf buildValidateCondition(Symbol.VarSymbol param, Class<? extends Annotation> annotation) {
+        Min min = (Min) Validates.lookupAnnotation(param, annotation);
         JCTree.JCExpression condition = Validates.buildMinExpression(maker, names, param, min.value());
         return Validates.buildValidateException(maker, names, param, condition, this.getException(min), min.message(),
                 param.name.toString(), min.value());
