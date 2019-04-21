@@ -95,7 +95,8 @@ public abstract class Validates {
      * @return 参数代码对象
      */
     public static Symbol.VarSymbol lookupComparableArgument(Symbol.VarSymbol param, String arg) {
-        if (param.name.toString().equals(arg) || !isComparable((Symbol.ClassSymbol) param.type.tsym)) {
+        if (arg.isEmpty() || (arg = arg.trim()).isEmpty()
+                || param.name.toString().equals(arg) || !isComparable((Symbol.ClassSymbol) param.type.tsym)) {
             return null;
         }
         for (Symbol.VarSymbol var : ((Symbol.MethodSymbol) param.owner).params) {

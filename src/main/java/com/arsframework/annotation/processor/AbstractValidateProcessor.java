@@ -1,8 +1,6 @@
 package com.arsframework.annotation.processor;
 
-import java.util.Set;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 import java.lang.annotation.Annotation;
 
 import javax.lang.model.SourceVersion;
@@ -16,6 +14,7 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.ListBuffer;
@@ -80,6 +79,24 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
     }
 
     /**
+     * 判断代码逻辑是否为构造方法调用
+     *
+     * @param statement 代码逻辑对象
+     * @return true/false
+     */
+    protected boolean isConstructorInvocation(JCTree.JCStatement statement) {
+        if (statement instanceof JCTree.JCExpressionStatement) {
+            JCTree.JCExpression expression = ((JCTree.JCExpressionStatement) statement).expr;
+            if (expression instanceof JCTree.JCMethodInvocation
+                    && ((JCTree.JCMethodInvocation) expression).meth.getKind() == Tree.Kind.IDENTIFIER) {
+                Name name = ((JCTree.JCIdent) ((JCTree.JCMethodInvocation) expression).meth).name;
+                return name == name.table.names._this || name == name.table.names._super;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 判断注解是否被忽略
      *
      * @param param      参数代码对象
@@ -121,7 +138,11 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
      * @param param 参数代码对象
      */
     protected void buildValidateBlock(Symbol.VarSymbol param) {
-        this.appendValidateBlock(((JCTree.JCMethodDecl) trees.getTree(param.owner)).body, param);
+        JCTree.JCStatement condition = this.buildValidateCondition(param);
+        if (condition != null) {
+            Symbol.MethodSymbol method = (Symbol.MethodSymbol) param.owner;
+            this.appendValidateBlock(method, method.params.indexOf(param), Arrays.asList(condition));
+        }
     }
 
     /**
@@ -131,9 +152,15 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
      */
     protected void buildValidateBlock(Symbol.MethodSymbol method) {
         if (method != null && method.params != null && !method.params.isEmpty()) {
-            JCTree.JCBlock body = trees.getTree(method).body;
+            List<JCTree.JCStatement> conditions = new ArrayList<>(method.params.size());
             for (Symbol.VarSymbol param : method.params) {
-                this.appendValidateBlock(body, param);
+                JCTree.JCStatement condition = this.buildValidateCondition(param);
+                if (condition != null) {
+                    conditions.add(condition);
+                }
+            }
+            if (!conditions.isEmpty()) {
+                this.appendValidateBlock(method, 0, conditions);
             }
         }
     }
@@ -141,32 +168,39 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
     /**
      * 添加参数校验代码块
      *
-     * @param body  方法体代码对象
-     * @param param 参数代码对象
+     * @param method     方法代码对象
+     * @param index      添加代码块下标位置
+     * @param conditions 校验代码逻辑列表
      */
-    private void appendValidateBlock(JCTree.JCBlock body, Symbol.VarSymbol param) {
-        // 构建参数校验逻辑条件
-        JCTree.JCStatement condition = this.buildValidateCondition(param);
-        if (condition == null) {
+    private void appendValidateBlock(Symbol.MethodSymbol method, int index, List<JCTree.JCStatement> conditions) {
+        if (conditions.isEmpty()) {
             return;
         }
 
-        // 判断方法体第一行是否为构造方法调用（super、this），如果是则将校验代码块追加到构造方法调用后面，否则添加到方法体最前面
-        if (param.owner.getKind() == ElementKind.CONSTRUCTOR && body.stats.head instanceof JCTree.JCExpressionStatement) {
-            JCTree.JCExpression expression = ((JCTree.JCExpressionStatement) body.stats.head).expr;
-            if (expression instanceof JCTree.JCMethodInvocation
-                    && ((JCTree.JCMethodInvocation) expression).meth.getKind() == Tree.Kind.IDENTIFIER) {
-                ListBuffer stats = ListBuffer.of(body.stats.head).append(condition);
-                Iterator<JCTree.JCStatement> iterator = body.stats.iterator();
-                iterator.next(); // 过滤第一行构造方法调用
-                while (iterator.hasNext()) {
-                    stats.append(iterator.next());
-                }
-                body.stats = stats.toList(); // 重置方法体代码块
-                return;
-            }
+        JCTree.JCBlock body = trees.getTree(method).body; // 获取方法对应的方法体
+        if (method.isConstructor() && this.isConstructorInvocation(body.stats.head)) { // 如果方法体存在构造方法调用则将校验代码插入位置后移1位
+            index++;
         }
-        body.stats = body.stats.prepend(condition); // 将参数校验条件表达式添加到方法代码块最前面
+
+        // 重置方法体代码块
+        if (index == 0) { // 将参数校验条件表达式添加到方法代码块最前面
+            for (int i = conditions.size() - 1; i > -1; i--) {
+                body.stats = body.stats.prepend(conditions.get(i));
+            }
+        } else { // 将参数校验代码块从指定下标位置开始插入
+            ListBuffer stats = new ListBuffer();
+            Iterator<JCTree.JCStatement> iterator = body.stats.iterator();
+            while (index-- > 0 && iterator.hasNext()) {
+                stats.append(iterator.next());
+            }
+            for (JCTree.JCStatement condition : conditions) {
+                stats.append(condition);
+            }
+            while (iterator.hasNext()) {
+                stats.append(iterator.next());
+            }
+            body.stats = stats.toList();
+        }
     }
 
     /**

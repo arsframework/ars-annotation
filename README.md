@@ -11,7 +11,7 @@ JDK1.8+
 <dependency>
     <groupId>com.arsframework</groupId>
     <artifactId>ars-annotation</artifactId>
-    <version>1.4.2</version>
+    <version>1.4.3</version>
 </dependency>
 ```
 
@@ -274,7 +274,7 @@ public class Test {
 ```double```及其包装类型参数。
 
 #### 3.9.1 注解方法
-- ```String value()```方法设置被比较参数名称。
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be less than argument '%s'```。
 - ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
@@ -300,7 +300,7 @@ public class Test {
 ```double```及其包装类型参数。
 
 #### 3.10.1 注解方法
-- ```String value()```方法设置被比较参数名称。
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be less than or equal to argument '%s'```。
 - ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
@@ -326,7 +326,7 @@ public class Test {
 ```double```及其包装类型参数。
 
 #### 3.11.1 注解方法
-- ```String value()```方法设置被比较参数名称。
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be greater than argument '%s'```。
 - ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
@@ -352,7 +352,7 @@ public class Test {
 ```double```及其包装类型参数。
 
 #### 3.12.1 注解方法
-- ```String value()```方法设置被比较参数名称。
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
 - ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
 默认为```The value of argument '%s' must be greater than or equal to argument '%s'```。
 - ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
@@ -430,4 +430,9 @@ public class Test {
 2. 新增```@Ignore```注解
 
 ### v1.4.2
-1. 在```@Ignore```注解中新增```Class<? extends Annotation>[] value()```方法，用于忽略指定注解。
+1. 在```@Ignore```注解中新增```Class<? extends Annotation>[] value()```方法，用于忽略指定注解
+
+### v1.4.3
+1. 修复在构造方法中调用静态方法被识别为构造方法调用的Bug 
+2. 更新```@Lt```、```@Le```、```@Gt```、```@Ge```注解处理逻辑，当注解被比较参数值为空（含空格）时忽略该注解
+
