@@ -19,7 +19,7 @@ public class FormatValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param format 参数格式校验注解
+     * @param format 校验注解实例
      * @return 类名称
      */
     protected String getException(Format format) {

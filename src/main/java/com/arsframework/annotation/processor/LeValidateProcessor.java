@@ -19,7 +19,7 @@ public class LeValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param le 参数小于或等于校验注解
+     * @param le 校验注解实例
      * @return 类名称
      */
     protected String getException(Le le) {

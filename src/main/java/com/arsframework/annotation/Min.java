@@ -16,7 +16,7 @@ public @interface Min {
     /**
      * 默认异常信息
      */
-    String DEFAULT_EXCEPTION_MESSAGE = "The size of argument '%s' must be greater than or equal to %d";
+    String DEFAULT_EXCEPTION_MESSAGE = "The value of argument '%s' must be greater than or equal to %d";
 
     /**
      * 获取参数最小值

@@ -19,7 +19,7 @@ public class LtValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param lt 参数小于校验注解
+     * @param lt 校验注解实例
      * @return 类名称
      */
     protected String getException(Lt lt) {

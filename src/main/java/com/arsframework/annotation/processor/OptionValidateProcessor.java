@@ -20,7 +20,7 @@ public class OptionValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param option 参数选项校验注解
+     * @param option 校验注解实例
      * @return 类名称
      */
     protected String getException(Option option) {

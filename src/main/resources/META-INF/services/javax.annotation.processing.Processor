@@ -2,9 +2,14 @@ com.arsframework.annotation.processor.GtValidateProcessor
 com.arsframework.annotation.processor.GeValidateProcessor
 com.arsframework.annotation.processor.LtValidateProcessor
 com.arsframework.annotation.processor.LeValidateProcessor
+com.arsframework.annotation.processor.EqValidateProcessor
+com.arsframework.annotation.processor.NeValidateProcessor
+com.arsframework.annotation.processor.IsValidateProcessor
+com.arsframework.annotation.processor.NotValidateProcessor
 com.arsframework.annotation.processor.MaxValidateProcessor
 com.arsframework.annotation.processor.MinValidateProcessor
 com.arsframework.annotation.processor.SizeValidateProcessor
+com.arsframework.annotation.processor.BoolValidateProcessor
 com.arsframework.annotation.processor.OptionValidateProcessor
 com.arsframework.annotation.processor.FormatValidateProcessor
 com.arsframework.annotation.processor.NonnullValidateProcessor

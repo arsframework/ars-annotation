@@ -19,7 +19,7 @@ public class GtValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param gt 参数大于校验注解
+     * @param gt 校验注解实例
      * @return 类名称
      */
     protected String getException(Gt gt) {

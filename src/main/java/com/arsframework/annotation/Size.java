@@ -16,7 +16,7 @@ public @interface Size {
     /**
      * 默认异常信息
      */
-    String DEFAULT_EXCEPTION_MESSAGE = "The size of argument '%s' must be in interval [%d, %d]";
+    String DEFAULT_EXCEPTION_MESSAGE = "The value of argument '%s' must be in interval [%d, %d]";
 
     /**
      * 获取参数最小值

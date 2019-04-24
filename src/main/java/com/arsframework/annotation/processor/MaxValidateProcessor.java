@@ -19,7 +19,7 @@ public class MaxValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param max 参数最大值校验注解
+     * @param max 校验注解实例
      * @return 类名称
      */
     protected String getException(Max max) {

@@ -19,7 +19,7 @@ public class NonnullValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param nonnull 参数非Null校验注解
+     * @param nonnull 校验注解实例
      * @return 类名称
      */
     protected String getException(Nonnull nonnull) {

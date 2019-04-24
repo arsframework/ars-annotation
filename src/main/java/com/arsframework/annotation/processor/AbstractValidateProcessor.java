@@ -1,6 +1,10 @@
 package com.arsframework.annotation.processor;
 
-import java.util.*;
+import java.util.Set;
+import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.ArrayList;
 import java.lang.annotation.Annotation;
 
 import javax.lang.model.SourceVersion;
@@ -57,9 +61,10 @@ public abstract class AbstractValidateProcessor extends AbstractProcessor {
             try {
                 Class<? extends Annotation> annotation = (Class<? extends Annotation>) Class.forName(type);
                 for (Element element : env.getElementsAnnotatedWith(annotation)) {
-                    if (element.getKind() == ElementKind.ENUM || element.getKind() == ElementKind.CLASS) { // 枚举/类元素
+                    if (element.getKind() == ElementKind.ENUM || element.getKind() == ElementKind.CLASS
+                            || element.getKind() == ElementKind.INTERFACE) { // 枚举/类/接口元素
                         for (JCTree def : ((JCTree.JCClassDecl) trees.getTree(element)).defs) {
-                            if (def.getKind() == Tree.Kind.METHOD) {
+                            if (def.getKind() == Tree.Kind.METHOD && ((JCTree.JCMethodDecl) def).body != null) {
                                 this.buildValidateBlock(((JCTree.JCMethodDecl) def).sym, annotation);
                             }
                         }

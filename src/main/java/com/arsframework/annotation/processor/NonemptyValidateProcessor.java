@@ -19,7 +19,7 @@ public class NonemptyValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param nonempty 参数非空校验注解
+     * @param nonempty 校验注解实例
      * @return 类名称
      */
     protected String getException(Nonempty nonempty) {

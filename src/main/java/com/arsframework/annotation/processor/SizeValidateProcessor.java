@@ -19,7 +19,7 @@ public class SizeValidateProcessor extends AbstractValidateProcessor {
     /**
      * 获取异常类名称
      *
-     * @param size 参数范围校验注解
+     * @param size 校验注解实例
      * @return 类名称
      */
     protected String getException(Size size) {

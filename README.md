@@ -11,7 +11,7 @@ JDK1.8+
 <dependency>
     <groupId>com.arsframework</groupId>
     <artifactId>ars-annotation</artifactId>
-    <version>1.4.4</version>
+    <version>1.4.5</version>
 </dependency>
 ```
 
@@ -62,324 +62,13 @@ public class Test {
 }
 ```
 
-### 3.2 @Nonnull 注解
-该注解用于对参数进行非Null（与空字符串进行区分）校验，适用于除基本数据类型以外的所有类型参数。
-
-#### 3.2.1 注解方法
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称)```的方式对其进行格式化，
-默认为```The value of argument '%s' must not be null```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.2.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-    /**
-     * @param s 生效
-     * @param i 忽略
-     * @param n 生效
-     */
-    @Nonnull
-    public static void b(String s, int i, Integer n) {
-    }
-}
-```
-### 3.3 @Nonempty 注解
-该注解除了对参数进行非Null校验以外，还将对```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```以及数组类型参数进行非空校验。
-
-#### 3.3.1 注解方法
-- ```boolean blank()```方法设置```java.lang.CharSequence```类型参数是否允许空白，默认为```true```。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称)```的方式对其进行格式化，
-默认为```The value of argument '%s' must not be empty```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.3.2 示例
-```
-import java.util.Map;
-import java.util.Collection;
-
-import com.arsframework.annotation.*;
-
-public class Test {
-    /**
-     * @param s          生效
-     * @param i          忽略
-     * @param n          生效
-     * @param array      生效
-     * @param map        生效
-     * @param collection 生效
-     */
-    @Nonempty
-    public static void b(String s, int i, Integer n, Object[] array, Map map, Collection collection) {
-    }
-}
-```
-
-### 3.4 @Format 注解
-该注解用于对```java.lang.Number```、```java.lang.CharSequence```和```byte```、```char```、```int```、```short```、```float```、```long```、```double```
-及其包装类型参数在数据不为Null时作数据格式校验。
-
-#### 3.4.1 注解方法
-- ```String value()```方法设置数据格式匹配模式（正则表达式）。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 匹配模式)```的方式对其进行格式化，
-默认为```The format of argument '%s' must be matched for '%s'```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.4.2 示例
-```
-import java.util.Map;
-import java.util.Collection;
-
-import com.arsframework.annotation.*;
-
-public class Test {
-    /**
-     * @param s          生效
-     * @param i          生效
-     * @param n          生效
-     * @param array      忽略
-     * @param map        忽略
-     * @param collection 忽略
-     */
-    @Format("123")
-    public static void b(String s, int i, Integer n, Object[] array, Map map, Collection collection) {
-    }
-}
-```
-
-### 3.5 @Min 注解
-该注解用于参数值不为Null时的最小值校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
-```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
-```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
-```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
-
-#### 3.5.1 注解方法
-- ```long value()```方法设置参数最小值。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最小值)```的方式对其进行格式化，
-默认为```The size of argument '%s' must be greater than or equal to %d```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.5.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-
-    /**
-     * @param s     生效
-     * @param i     生效
-     * @param array 生效
-     * @param t     忽略
-     */
-    @Min(100)
-    public static void b(String s, Integer i, Object[] array, Test t) {
-    }
-}
-```
-
-### 3.6 @Max 注解
-该注解用于参数值不为Null时的最大值校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
-```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
-```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
-```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
-
-#### 3.6.1 注解方法
-- ```long value()```方法设置参数最大值。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最大值)```的方式对其进行格式化，
-默认为```The size of argument '%s' must be less than or equal to %d```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.6.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-
-    /**
-     * @param s     生效
-     * @param i     生效
-     * @param array 生效
-     * @param t     忽略
-     */
-    @Max(100)
-    public static void b(String s, Integer i, Object[] array, Test t) {
-    }
-}
-```
-
-### 3.7 @Size 注解
-该注解用于当参数值不为Null时的参数值范围校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
-```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
-```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
-```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
-
-#### 3.7.1 注解方法
-- ```long min()```方法设置参数最小值，默认为```Long.MIN_VALUE```。
-- ```long max()```方法设置参数最大值，默认为```Long.MAX_VALUE```。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最小值、参数最大值)```的方式对其进行格式化，
-默认为```The size of argument '%s' must be in interval [%d, %d]```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.7.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-
-    /**
-     * @param s     生效
-     * @param i     生效
-     * @param array 生效
-     * @param t     忽略
-     */
-    @Size(min = 1, max = 100)
-    public static void b(String s, Integer i, Object[] array, Test t) {
-    }
-}
-```
-
-### 3.8 @Option 注解
-该注解用于当参数值不为Null时的参数值选项校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
-```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
-```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
-```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
-
-#### 3.8.1 注解方法
-- ```long[] value()```方法设置参数值选项数组，如果参数值选项数组为空则自动忽略该注解。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数选项数组字符串)```的方式对其进行格式化，
-默认为```The value of argument '%s' must be in option %s```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.8.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-
-    /**
-     * @param s     生效
-     * @param i     生效
-     * @param array 生效
-     * @param t     忽略
-     */
-    @Option({1, 2, 3})
-    public static void b(String s, Integer i, Object[] array, Test t) {
-    }
-}
-```
-
-### 3.9 @Lt 注解
-该注解用于当两个参数值不为Null时的小于校验，适用于```java.lang.Comparable```和```byte```、```char```、```int```、```short```、```float```、```long```、
-```double```及其包装类型参数。
-
-#### 3.9.1 注解方法
-- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
-默认为```The value of argument '%s' must be less than argument '%s'```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.9.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-    /**
-     * @param s 忽略
-     * @param i 忽略
-     * @param n 生效
-     */
-    @Lt("i")
-    public static void b(String s, int i, Integer n) {
-    }
-}
-```
-
-### 3.10 @Le 注解
-该注解用于当两个参数值不为Null时的小于或等于校验，适用于```java.lang.Comparable```和```byte```、```char```、```int```、```short```、```float```、```long```、
-```double```及其包装类型参数。
-
-#### 3.10.1 注解方法
-- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
-默认为```The value of argument '%s' must be less than or equal to argument '%s'```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.10.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-    /**
-     * @param s 忽略
-     * @param i 忽略
-     * @param n 生效
-     */
-    @Le("i")
-    public static void b(String s, int i, Integer n) {
-    }
-}
-```
-
-### 3.11 @Gt 注解
-该注解用于当两个参数值不为Null时的大于校验，适用于```java.lang.Comparable```和```byte```、```char```、```int```、```short```、```float```、```long```、
-```double```及其包装类型参数。
-
-#### 3.11.1 注解方法
-- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
-默认为```The value of argument '%s' must be greater than argument '%s'```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.11.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-    /**
-     * @param s 忽略
-     * @param i 忽略
-     * @param n 生效
-     */
-    @Gt("i")
-    public static void b(String s, int i, Integer n) {
-    }
-}
-```
-
-### 3.12 @Ge 注解
-该注解用于当两个参数值不为Null时的大于或等于校验，适用于```java.lang.Comparable```和```byte```、```char```、```int```、```short```、```float```、```long```、
-```double```及其包装类型参数。
-
-#### 3.12.1 注解方法
-- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
-- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
-默认为```The value of argument '%s' must be greater than or equal to argument '%s'```。
-- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
-
-#### 3.12.2 示例
-```
-import com.arsframework.annotation.*;
-
-public class Test {
-    /**
-     * @param s 忽略
-     * @param i 忽略
-     * @param n 生效
-     */
-    @Ge("i")
-    public static void b(String s, int i, Integer n) {
-    }
-}
-```
-
-### 3.13 @Ignore 注解
+### 3.2 @Ignore 注解
 该注解用于忽略参数校验注解，且优先级高于其他参数校验注解。如果被忽略注解数组为空，则忽略所有注解；否则忽略指定注解。
 
-#### 3.13.1 注解方法
+#### 3.2.1 注解方法
 - ```Class<? extends Annotation>[] value()```方法设置被忽略的注解类，默认为空数组。
 
-#### 3.13.2 示例
+#### 3.2.2 示例
 ```
 import com.arsframework.annotation.*;
 
@@ -405,6 +94,454 @@ public class Test {
      * @param n 忽略
      */
     public static void c(String s, @Ignore Integer n) {
+    }
+}
+```
+
+### 3.3 @Nonnull 注解
+该注解用于对参数进行非Null（与空字符串进行区分）校验，适用于除基本数据类型以外的所有类型参数。
+
+#### 3.3.1 注解方法
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must not be null```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.3.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s 生效
+     * @param i 忽略
+     * @param n 生效
+     */
+    @Nonnull
+    public static void b(String s, int i, Integer n) {
+    }
+}
+```
+### 3.4 @Nonempty 注解
+该注解除了对参数进行非Null校验以外，还将对```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```以及数组类型参数进行非空校验。
+
+#### 3.4.1 注解方法
+- ```boolean blank()```方法设置```java.lang.CharSequence```类型参数是否允许空白，默认为```true```。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must not be empty```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.4.2 示例
+```
+import java.util.Map;
+import java.util.Collection;
+
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s          生效
+     * @param i          忽略
+     * @param n          生效
+     * @param array      生效
+     * @param map        生效
+     * @param collection 生效
+     */
+    @Nonempty
+    public static void b(String s, int i, Integer n, Object[] array, Map map, Collection collection) {
+    }
+}
+```
+
+### 3.5 @Format 注解
+该注解用于对```java.lang.Number```、```java.lang.CharSequence```和```byte```、```char```、```int```、```short```、```float```、```long```、```double```
+及其包装类型参数在数据不为Null时作数据格式校验。
+
+#### 3.5.1 注解方法
+- ```String value()```方法设置数据格式匹配模式（正则表达式）。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 匹配模式)```的方式对其进行格式化，
+默认为```The format of argument '%s' must be matched for '%s'```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.5.2 示例
+```
+import java.util.Map;
+import java.util.Collection;
+
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s          生效
+     * @param i          生效
+     * @param n          生效
+     * @param array      忽略
+     * @param map        忽略
+     * @param collection 忽略
+     */
+    @Format("123")
+    public static void b(String s, int i, Integer n, Object[] array, Map map, Collection collection) {
+    }
+}
+```
+
+### 3.6 @Is 注解
+该注解用于参数固定值校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
+```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
+```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
+```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
+
+#### 3.6.1 注解方法
+- ```long value()```方法设置参数值。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数值)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be %d```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.6.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+
+    /**
+     * @param s     生效
+     * @param i     生效
+     * @param array 生效
+     * @param t     忽略
+     */
+    @Is(100)
+    public static void b(String s, Integer i, Object[] array, Test t) {
+    }
+}
+```
+
+### 3.7 @Not 注解
+该注解用于参数非固定值校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
+```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
+```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
+```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
+
+#### 3.7.1 注解方法
+- ```long value()```方法设置参数值。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数值)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be %d```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.7.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+
+    /**
+     * @param s     生效
+     * @param i     生效
+     * @param array 生效
+     * @param t     忽略
+     */
+    @Not(100)
+    public static void b(String s, Integer i, Object[] array, Test t) {
+    }
+}
+```
+
+### 3.8 @Bool 注解
+该注解用于参数真/假值校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
+```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
+```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
+```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
+
+#### 3.8.1 注解方法
+- ```boolean value()```方法设置参数真假。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数值)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be %b```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.8.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+
+    /**
+     * @param b     生效
+     * @param s     忽略
+     * @param i     忽略
+     * @param array 忽略
+     * @param t     忽略
+     */
+    @Bool(true)
+    public static void b(Boolean b, String s, Integer i, Object[] array, Test t) {
+    }
+}
+```
+
+### 3.9 @Min 注解
+该注解用于参数值不为Null时的最小值校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
+```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
+```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
+```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
+
+#### 3.9.1 注解方法
+- ```long value()```方法设置参数最小值。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最小值)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be greater than or equal to %d```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.9.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+
+    /**
+     * @param s     生效
+     * @param i     生效
+     * @param array 生效
+     * @param t     忽略
+     */
+    @Min(100)
+    public static void b(String s, Integer i, Object[] array, Test t) {
+    }
+}
+```
+
+### 3.10 @Max 注解
+该注解用于参数值不为Null时的最大值校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
+```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
+```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
+```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
+
+#### 3.10.1 注解方法
+- ```long value()```方法设置参数最大值。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最大值)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be less than or equal to %d```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.10.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+
+    /**
+     * @param s     生效
+     * @param i     生效
+     * @param array 生效
+     * @param t     忽略
+     */
+    @Max(100)
+    public static void b(String s, Integer i, Object[] array, Test t) {
+    }
+}
+```
+
+### 3.11 @Size 注解
+该注解用于当参数值不为Null时的参数值范围校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
+```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
+```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
+```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
+
+#### 3.11.1 注解方法
+- ```long min()```方法设置参数最小值，默认为```Long.MIN_VALUE```。
+- ```long max()```方法设置参数最大值，默认为```Long.MAX_VALUE```。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数最小值、参数最大值)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be in interval [%d, %d]```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.11.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+
+    /**
+     * @param s     生效
+     * @param i     生效
+     * @param array 生效
+     * @param t     忽略
+     */
+    @Size(min = 1, max = 100)
+    public static void b(String s, Integer i, Object[] array, Test t) {
+    }
+}
+```
+
+### 3.12 @Option 注解
+该注解用于当参数值不为Null时的参数值选项校验，适用于数组、```java.lang.Enum```、```java.util.Date```、```java.math.BigInteger```、```java.math.BigDecimal```、
+```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```和```byte```、```char```、```int```、```short```、```float```、
+```long```、```double```及其包装类型参数。针对```java.lang.Enum```类型参数将调用```ordinal()```方法比较；针对```java.util.Date```类型参数将调用
+```getTime()```方法比较；针对数组、```java.lang.CharSequence```、```java.util.Map```、```java.util.Collection```类型参数将对参数长度大小比较。
+
+#### 3.12.1 注解方法
+- ```long[] value()```方法设置参数值选项数组，如果参数值选项数组为空则自动忽略该注解。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 参数选项数组字符串)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be in option %s```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.12.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+
+    /**
+     * @param s     生效
+     * @param i     生效
+     * @param array 生效
+     * @param t     忽略
+     */
+    @Option({1, 2, 3})
+    public static void b(String s, Integer i, Object[] array, Test t) {
+    }
+}
+```
+
+### 3.13 @Eq 注解
+该注解用于当两个参数值等于校验，适用于```java.lang.Comparable```和基本数据类型及其包装类型参数。
+
+#### 3.13.1 注解方法
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be equal to argument '%s'```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.13.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s 忽略
+     * @param i 忽略
+     * @param n 生效
+     */
+    @Eq("i")
+    public static void b(String s, int i, Integer n) {
+    }
+}
+```
+
+### 3.14 @Ne 注解
+该注解用于当两个参数值不等于校验，适用于```java.lang.Comparable```和基本数据类型及其包装类型参数。
+
+#### 3.14.1 注解方法
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must not be equal to argument '%s'```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.14.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s 忽略
+     * @param i 忽略
+     * @param n 生效
+     */
+    @Ne("i")
+    public static void b(String s, int i, Integer n) {
+    }
+}
+```
+
+### 3.15 @Gt 注解
+该注解用于当两个参数值不为Null时的大于校验，适用于```java.lang.Comparable```和基本数据类型及其包装类型参数。
+
+#### 3.15.1 注解方法
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be greater than argument '%s'```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.15.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s 忽略
+     * @param i 忽略
+     * @param n 生效
+     */
+    @Gt("i")
+    public static void b(String s, int i, Integer n) {
+    }
+}
+```
+
+### 3.16 @Ge 注解
+该注解用于当两个参数值不为Null时的大于或等于校验，适用于```java.lang.Comparable```和基本数据类型及其包装类型参数。
+
+#### 3.16.1 注解方法
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be greater than or equal to argument '%s'```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.16.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s 忽略
+     * @param i 忽略
+     * @param n 生效
+     */
+    @Ge("i")
+    public static void b(String s, int i, Integer n) {
+    }
+}
+```
+
+### 3.17 @Lt 注解
+该注解用于当两个参数值不为Null时的小于校验，适用于```java.lang.Comparable```和基本数据类型及其包装类型参数。
+
+#### 3.17.1 注解方法
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be less than argument '%s'```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.17.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s 忽略
+     * @param i 忽略
+     * @param n 生效
+     */
+    @Lt("i")
+    public static void b(String s, int i, Integer n) {
+    }
+}
+```
+
+### 3.18 @Le 注解
+该注解用于当两个参数值不为Null时的小于或等于校验，适用于```java.lang.Comparable```和基本数据类型及其包装类型参数。
+
+#### 3.18.1 注解方法
+- ```String value()```方法设置被比较参数名称，忽略参数前后空格。
+- ```String message()```方法设置参数校验异常信息，其内部采用```String.format(message, 参数名称, 被比较参数名称)```的方式对其进行格式化，
+默认为```The value of argument '%s' must be less than or equal to argument '%s'```。
+- ```Class<? extends Throwable> exception()```方法设置参数校验失败异常类，默认为```java.lang.IllegalArgumentException```。
+
+#### 3.18.2 示例
+```
+import com.arsframework.annotation.*;
+
+public class Test {
+    /**
+     * @param s 忽略
+     * @param i 忽略
+     * @param n 生效
+     */
+    @Le("i")
+    public static void b(String s, int i, Integer n) {
     }
 }
 ```
@@ -439,4 +576,10 @@ public class Test {
 
 ### v1.4.4
 1. 修复参数校验顺序一致性Bug，取消注解作用于参数时的校验顺序一致性。
+
+### v1.4.5
+1. Bug修复及性能优化
+2. 支持接口默认方法参数校验
+3. 新增```com.arsframework.annotation.Eq```、```com.arsframework.annotation.Ne```、```com.arsframework.annotation.Is```、
+```com.arsframework.annotation.Not```、```com.arsframework.annotation.Bool```注解
 

@@ -6,27 +6,27 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 参数最大值校验注解，适用于数字、枚举、日期、字符序列、数组、字典、集合、列表类型参数
+ * 参数值不等于比较注解，适用于数字、java.lang.Comparable类型参数
  *
  * @author yongqiang.wu
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
-public @interface Max {
+public @interface Ne {
     /**
      * 默认异常信息
      */
-    String DEFAULT_EXCEPTION_MESSAGE = "The value of argument '%s' must be less than or equal to %d";
+    String DEFAULT_EXCEPTION_MESSAGE = "The value of argument '%s' must not be equal to argument '%s'";
 
     /**
-     * 获取参数最大值
+     * 获取被比较参数名称
      *
-     * @return 最大值
+     * @return 参数名称
      */
-    long value();
+    String value();
 
     /**
-     * 参数验证失败消息，格式化参数:参数名称、参数最大值
+     * 参数验证失败消息，格式化参数:比较参数名称、被比较参数名称
      *
      * @return 消息字符串
      */

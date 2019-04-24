@@ -68,7 +68,26 @@ public abstract class Validates {
      * @return true/false
      */
     public static boolean isComparable(Symbol.ClassSymbol symbol) {
-        return isNumber(symbol) || isType(symbol, Comparable.class);
+        return isNumber(symbol) || isType(symbol, boolean.class, Comparable.class);
+    }
+
+    /**
+     * 判断对象是否相同
+     *
+     * @param clazz 对象代码
+     * @param other 对象代码
+     * @return true/false
+     */
+    public static boolean isEqual(Symbol.ClassSymbol clazz, Symbol.ClassSymbol other) {
+        return clazz.equals(other)
+                || (isType(clazz, byte.class, Byte.class) && isType(other, byte.class, Byte.class))
+                || (isType(clazz, char.class, Character.class) && isType(other, char.class, Character.class))
+                || (isType(clazz, int.class, Integer.class) && isType(other, int.class, Integer.class))
+                || (isType(clazz, short.class, Short.class) && isType(other, short.class, Short.class))
+                || (isType(clazz, float.class, Float.class) && isType(other, float.class, Float.class))
+                || (isType(clazz, long.class, Long.class) && isType(other, long.class, Long.class))
+                || (isType(clazz, double.class, Double.class) && isType(other, double.class, Double.class))
+                || (isType(clazz, boolean.class, Boolean.class) && isType(other, boolean.class, Boolean.class));
     }
 
     /**
@@ -95,18 +114,12 @@ public abstract class Validates {
      * @return 参数代码对象
      */
     public static Symbol.VarSymbol lookupComparableArgument(Symbol.VarSymbol param, String arg) {
-        if (arg.isEmpty() || (arg = arg.trim()).isEmpty()
-                || param.name.toString().equals(arg) || !isComparable((Symbol.ClassSymbol) param.type.tsym)) {
-            return null;
-        }
-        for (Symbol.VarSymbol var : ((Symbol.MethodSymbol) param.owner).params) {
-            if (var.name.toString().equals(arg)) {
-                if (!isComparable((Symbol.ClassSymbol) var.type.tsym)
-                        || (!param.type.equals(var.type)
-                        && (!isNumber((Symbol.ClassSymbol) param.type.tsym) || !isNumber((Symbol.ClassSymbol) var.type.tsym)))) {
-                    return null;
+        if (!(arg.isEmpty() || (arg = arg.trim()).isEmpty() || param.name.toString().equals(arg))) {
+            for (Symbol.VarSymbol var : ((Symbol.MethodSymbol) param.owner).params) {
+                if (var.name.toString().equals(arg)) {
+                    return isEqual((Symbol.ClassSymbol) param.type.tsym, (Symbol.ClassSymbol) var.type.tsym)
+                            && isComparable((Symbol.ClassSymbol) var.type.tsym) ? var : null;
                 }
-                return var;
             }
         }
         return null;
@@ -272,10 +285,18 @@ public abstract class Validates {
                     List.nil()
             ));
         } else if (isType((Symbol.ClassSymbol) param.type.tsym, String.class)) { // 字符串
-            return maker.Binary(JCTree.Tag.OR, condition, maker.Apply(
+            JCTree.JCExpression expression = maker.Binary(JCTree.Tag.OR, condition, maker.Apply(
                     List.nil(),
                     maker.Select(
-                            blank ? maker.Ident(names.fromString(param.name.toString())) : maker.Apply(
+                            maker.Ident(names.fromString(param.name.toString())),
+                            names.fromString("isEmpty")
+                    ),
+                    List.nil()
+            ));
+            return blank ? expression : maker.Binary(JCTree.Tag.OR, expression, maker.Apply(
+                    List.nil(),
+                    maker.Select(
+                            maker.Apply(
                                     List.nil(),
                                     maker.Select(
                                             maker.Ident(names.fromString(param.name.toString())),
@@ -288,40 +309,40 @@ public abstract class Validates {
                     List.nil()
             ));
         } else if (isType((Symbol.ClassSymbol) param.type.tsym, CharSequence.class)) { // 字符序列
-            return maker.Binary(JCTree.Tag.OR, condition,
-                    blank ? maker.Binary(
-                            JCTree.Tag.EQ,
+            JCTree.JCExpression expression = maker.Binary(JCTree.Tag.OR, condition, maker.Binary(
+                    JCTree.Tag.EQ,
+                    maker.Apply(
+                            List.nil(),
+                            maker.Select(
+                                    maker.Ident(names.fromString(param.name.toString())),
+                                    names.fromString("length")
+                            ),
+                            List.nil()
+                    ),
+                    maker.Literal(TypeTag.INT, 0)
+            ));
+            return blank ? expression : maker.Binary(JCTree.Tag.OR, expression, maker.Apply(
+                    List.nil(),
+                    maker.Select(
                             maker.Apply(
                                     List.nil(),
                                     maker.Select(
-                                            maker.Ident(names.fromString(param.name.toString())),
-                                            names.fromString("length")
+                                            maker.Apply(
+                                                    List.nil(),
+                                                    maker.Select(
+                                                            maker.Ident(names.fromString(param.name.toString())),
+                                                            names.fromString("toString")
+                                                    ),
+                                                    List.nil()
+                                            ),
+                                            names.fromString("trim")
                                     ),
                                     List.nil()
                             ),
-                            maker.Literal(TypeTag.INT, 0)
-                    ) : maker.Apply(
-                            List.nil(),
-                            maker.Select(
-                                    maker.Apply(
-                                            List.nil(),
-                                            maker.Select(
-                                                    maker.Apply(
-                                                            List.nil(),
-                                                            maker.Select(
-                                                                    maker.Ident(names.fromString(param.name.toString())),
-                                                                    names.fromString("toString")
-                                                            ),
-                                                            List.nil()
-                                                    ),
-                                                    names.fromString("trim")
-                                            ),
-                                            List.nil()
-                                    ),
-                                    names.fromString("isEmpty")
-                            ),
-                            List.nil()
-                    ));
+                            names.fromString("isEmpty")
+                    ),
+                    List.nil()
+            ));
         }
         return condition;
     }
@@ -433,6 +454,34 @@ public abstract class Validates {
     }
 
     /**
+     * 构建参数固定值验证表达式
+     *
+     * @param maker 语法树构建器
+     * @param names 语法树节点名称对象
+     * @param param 参数代码对象
+     * @param value 参数值
+     * @return 语法树参数验证表达式对象
+     */
+    public static JCTree.JCExpression buildIsExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, long value) {
+        JCTree.JCExpression expression = buildNumberCompareExpression(maker, names, param, JCTree.Tag.NE, value);
+        return expression == null ? null : merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param), expression);
+    }
+
+    /**
+     * 构建参数非固定值验证表达式
+     *
+     * @param maker 语法树构建器
+     * @param names 语法树节点名称对象
+     * @param param 参数代码对象
+     * @param value 参数值
+     * @return 语法树参数验证表达式对象
+     */
+    public static JCTree.JCExpression buildNotExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, long value) {
+        JCTree.JCExpression expression = buildNumberCompareExpression(maker, names, param, JCTree.Tag.EQ, value);
+        return expression == null ? null : merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param), expression);
+    }
+
+    /**
      * 构建参数最大值验证表达式
      *
      * @param maker 语法树构建器
@@ -442,8 +491,8 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildMaxExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, long max) {
-        return merge(maker, JCTree.Tag.AND,
-                buildNonnullExpression(maker, names, param), buildNumberCompareExpression(maker, names, param, JCTree.Tag.GT, max));
+        JCTree.JCExpression expression = buildNumberCompareExpression(maker, names, param, JCTree.Tag.GT, max);
+        return expression == null ? null : merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param), expression);
     }
 
     /**
@@ -456,8 +505,8 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildMinExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, long min) {
-        return merge(maker, JCTree.Tag.AND,
-                buildNonnullExpression(maker, names, param), buildNumberCompareExpression(maker, names, param, JCTree.Tag.LT, min));
+        JCTree.JCExpression expression = buildNumberCompareExpression(maker, names, param, JCTree.Tag.LT, min);
+        return expression == null ? null : merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param), expression);
     }
 
     /**
@@ -471,10 +520,11 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildSizeExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, long min, long max) {
-        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param), merge(maker, JCTree.Tag.OR,
-                buildNumberCompareExpression(maker, names, param, JCTree.Tag.LT, min),
-                buildNumberCompareExpression(maker, names, param, JCTree.Tag.GT, max)
-        ));
+        JCTree.JCExpression minExpression = buildNumberCompareExpression(maker, names, param, JCTree.Tag.LT, min);
+        JCTree.JCExpression maxExpression = buildNumberCompareExpression(maker, names, param, JCTree.Tag.GT, max);
+        return minExpression == null || maxExpression == null ? null : merge(maker, JCTree.Tag.AND,
+                buildNonnullExpression(maker, names, param), merge(maker, JCTree.Tag.OR, minExpression, maxExpression)
+        );
     }
 
     /**
@@ -487,17 +537,72 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildOptionExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, long[] options) {
-        if (options.length == 0) {
+        JCTree.JCExpression expression;
+        if (options.length == 0 || (expression = buildNumberCompareExpression(maker, names, param, JCTree.Tag.NE, options[0])) == null) {
             return null;
-        }
-        JCTree.JCExpression condition = buildNumberCompareExpression(maker, names, param, JCTree.Tag.NE, options[0]);
-        if (options.length > 1) {
+        } else if (options.length > 1) {
             for (int i = 1; i < options.length; i++) {
-                condition = maker.Binary(JCTree.Tag.AND, condition,
+                expression = maker.Binary(JCTree.Tag.AND, expression,
                         buildNumberCompareExpression(maker, names, param, JCTree.Tag.NE, options[i]));
             }
         }
-        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param), condition);
+        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param), expression);
+    }
+
+    /**
+     * 构建参数比较验证表达式
+     *
+     * @param maker 语法树构建器
+     * @param names 语法树节点名称对象
+     * @param param 参数代码对象
+     * @param arg   被比较参数名称
+     * @param tag   比较标签
+     * @return 语法树参数验证表达式对象
+     */
+    public static JCTree.JCExpression buildCompareExpression(TreeMaker maker, Names names,
+                                                             Symbol.VarSymbol param, String arg, JCTree.Tag tag) {
+        boolean numeric; // 参数类型是否为数字
+        Symbol.VarSymbol target; // 被比较参数代码对象
+        if (!((numeric = isNumber((Symbol.ClassSymbol) param.type.tsym))
+                || isType((Symbol.ClassSymbol) param.type.tsym, boolean.class, Comparable.class))
+                || (target = lookupComparableArgument(param, arg)) == null) {
+            return null;
+        }
+
+        // 构建校验条件表达式
+        Boolean bool = null;
+        JCTree.JCExpression expression;
+        if (numeric || ((tag == JCTree.Tag.EQ || tag == JCTree.Tag.NE)
+                && (bool = isType((Symbol.ClassSymbol) param.type.tsym, boolean.class)))) {
+            expression = maker.Binary(tag, maker.Ident(names.fromString(param.name.toString())), maker.Ident(names.fromString(arg)));
+        } else if ((bool != null && bool) || isType((Symbol.ClassSymbol) param.type.tsym, boolean.class)) {
+            if (tag == JCTree.Tag.GT) {
+                expression = maker.Binary(JCTree.Tag.AND, maker.Ident(names.fromString(param.name.toString())),
+                        maker.Unary(JCTree.Tag.NOT, maker.Ident(names.fromString(arg)))
+                );
+            } else if (tag == JCTree.Tag.GE) {
+                expression = maker.Unary(JCTree.Tag.NOT, maker.Binary(JCTree.Tag.AND,
+                        maker.Unary(JCTree.Tag.NOT, maker.Ident(names.fromString(param.name.toString()))),
+                        maker.Ident(names.fromString(arg))
+                ));
+            } else if (tag == JCTree.Tag.LT) {
+                expression = maker.Binary(JCTree.Tag.AND, maker.Unary(JCTree.Tag.NOT, maker.Ident(names.fromString(param.name.toString()))),
+                        maker.Ident(names.fromString(arg))
+                );
+            } else {
+                expression = maker.Unary(JCTree.Tag.NOT, maker.Binary(JCTree.Tag.AND, maker.Ident(names.fromString(param.name.toString())),
+                        maker.Unary(JCTree.Tag.NOT, maker.Ident(names.fromString(arg)))
+                ));
+            }
+        } else {
+            expression = maker.Binary(tag, maker.Apply(List.nil(),
+                    maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString("compareTo")),
+                    List.of(maker.Ident(names.fromString(arg)))
+                    ),
+                    maker.Literal(TypeTag.INT, 0)
+            );
+        }
+        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param, target), expression);
     }
 
     /**
@@ -510,29 +615,7 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildGtExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, String arg) {
-        // 查找被比较参数
-        Symbol.VarSymbol argument = lookupComparableArgument(param, arg);
-        if (argument == null) {
-            return null;
-        }
-
-        // 构建校验条件表达式
-        JCTree.JCExpression condition;
-        if (isType((Symbol.ClassSymbol) param.type.tsym, Comparable.class)) {
-            condition = maker.Binary(
-                    JCTree.Tag.LT,
-                    maker.Apply(
-                            List.nil(),
-                            maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString("compareTo")),
-                            List.of(maker.Ident(names.fromString(arg)))
-                    ),
-                    maker.Literal(TypeTag.INT, 1)
-            );
-        } else {
-            condition = maker.Binary(JCTree.Tag.LE,
-                    maker.Ident(names.fromString(param.name.toString())), maker.Ident(names.fromString(arg)));
-        }
-        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param, argument), condition);
+        return buildCompareExpression(maker, names, param, arg, JCTree.Tag.LE);
     }
 
     /**
@@ -545,29 +628,7 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildGeExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, String arg) {
-        // 查找被比较参数
-        Symbol.VarSymbol argument = lookupComparableArgument(param, arg);
-        if (argument == null) {
-            return null;
-        }
-
-        // 构建校验条件表达式
-        JCTree.JCExpression condition;
-        if (isType((Symbol.ClassSymbol) param.type.tsym, Comparable.class)) {
-            condition = maker.Binary(
-                    JCTree.Tag.LT,
-                    maker.Apply(
-                            List.nil(),
-                            maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString("compareTo")),
-                            List.of(maker.Ident(names.fromString(arg)))
-                    ),
-                    maker.Literal(TypeTag.INT, 0)
-            );
-        } else {
-            condition = maker.Binary(JCTree.Tag.LT,
-                    maker.Ident(names.fromString(param.name.toString())), maker.Ident(names.fromString(arg)));
-        }
-        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param, argument), condition);
+        return buildCompareExpression(maker, names, param, arg, JCTree.Tag.LT);
     }
 
     /**
@@ -580,29 +641,7 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildLtExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, String arg) {
-        // 查找被比较参数
-        Symbol.VarSymbol argument = lookupComparableArgument(param, arg);
-        if (argument == null) {
-            return null;
-        }
-
-        // 构建校验条件表达式
-        JCTree.JCExpression condition;
-        if (isType((Symbol.ClassSymbol) param.type.tsym, Comparable.class)) {
-            condition = maker.Binary(
-                    JCTree.Tag.GT,
-                    maker.Apply(
-                            List.nil(),
-                            maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString("compareTo")),
-                            List.of(maker.Ident(names.fromString(arg)))
-                    ),
-                    maker.Literal(TypeTag.INT, -1)
-            );
-        } else {
-            condition = maker.Binary(JCTree.Tag.GE,
-                    maker.Ident(names.fromString(param.name.toString())), maker.Ident(names.fromString(arg)));
-        }
-        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param, argument), condition);
+        return buildCompareExpression(maker, names, param, arg, JCTree.Tag.GE);
     }
 
     /**
@@ -615,31 +654,52 @@ public abstract class Validates {
      * @return 语法树参数验证表达式对象
      */
     public static JCTree.JCExpression buildLeExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, String arg) {
-        // 查找被比较参数
-        Symbol.VarSymbol argument = lookupComparableArgument(param, arg);
-        if (argument == null) {
-            return null;
-        }
-
-        // 构建校验条件表达式
-        JCTree.JCExpression condition;
-        if (isType((Symbol.ClassSymbol) param.type.tsym, Comparable.class)) {
-            condition = maker.Binary(
-                    JCTree.Tag.GT,
-                    maker.Apply(
-                            List.nil(),
-                            maker.Select(maker.Ident(names.fromString(param.name.toString())), names.fromString("compareTo")),
-                            List.of(maker.Ident(names.fromString(arg)))
-                    ),
-                    maker.Literal(TypeTag.INT, 0)
-            );
-        } else {
-            condition = maker.Binary(JCTree.Tag.GT,
-                    maker.Ident(names.fromString(param.name.toString())), maker.Ident(names.fromString(arg)));
-        }
-        return merge(maker, JCTree.Tag.AND, buildNonnullExpression(maker, names, param, argument), condition);
+        return buildCompareExpression(maker, names, param, arg, JCTree.Tag.GT);
     }
 
+    /**
+     * 构建参数等于比较验证表达式
+     *
+     * @param maker 语法树构建器
+     * @param names 语法树节点名称对象
+     * @param param 参数代码对象
+     * @param arg   被比较参数名称
+     * @return 语法树参数验证表达式对象
+     */
+    public static JCTree.JCExpression buildEqExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, String arg) {
+        return buildCompareExpression(maker, names, param, arg, JCTree.Tag.NE);
+    }
+
+    /**
+     * 构建参数不等于比较验证表达式
+     *
+     * @param maker 语法树构建器
+     * @param names 语法树节点名称对象
+     * @param param 参数代码对象
+     * @param arg   被比较参数名称
+     * @return 语法树参数验证表达式对象
+     */
+    public static JCTree.JCExpression buildNeExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, String arg) {
+        return buildCompareExpression(maker, names, param, arg, JCTree.Tag.EQ);
+    }
+
+    /**
+     * 构建参数真/假值验证表达式
+     *
+     * @param maker 语法树构建器
+     * @param names 语法树节点名称对象
+     * @param param 参数代码对象
+     * @param bool  参数真/假值
+     * @return 语法树参数验证表达式对象
+     */
+    public static JCTree.JCExpression buildBoolExpression(TreeMaker maker, Names names, Symbol.VarSymbol param, boolean bool) {
+        if (isType((Symbol.ClassSymbol) param.type.tsym, boolean.class, Boolean.class)) {
+            JCTree.JCIdent ident = maker.Ident(names.fromString(param.toString()));
+            return merge(maker, JCTree.Tag.AND,
+                    buildNonnullExpression(maker, names, param), bool ? maker.Unary(JCTree.Tag.NOT, ident) : ident);
+        }
+        return null;
+    }
 
     /**
      * 构建验证异常块

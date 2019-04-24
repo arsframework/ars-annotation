@@ -6,27 +6,27 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 参数最大值校验注解，适用于数字、枚举、日期、字符序列、数组、字典、集合、列表类型参数
+ * 参数真/假值校验注解，适用于java.lang.Boolean类型参数
  *
  * @author yongqiang.wu
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
-public @interface Max {
+public @interface Bool {
     /**
      * 默认异常信息
      */
-    String DEFAULT_EXCEPTION_MESSAGE = "The value of argument '%s' must be less than or equal to %d";
+    String DEFAULT_EXCEPTION_MESSAGE = "The value of argument '%s' must be %b";
 
     /**
-     * 获取参数最大值
+     * 获取参数真/假值
      *
      * @return 最大值
      */
-    long value();
+    boolean value();
 
     /**
-     * 参数验证失败消息，格式化参数:参数名称、参数最大值
+     * 参数验证失败消息，格式化参数:参数名称，参数真/假值
      *
      * @return 消息字符串
      */
