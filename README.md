@@ -583,3 +583,7 @@ public class Test {
 3. 新增```com.arsframework.annotation.Eq```、```com.arsframework.annotation.Ne```、```com.arsframework.annotation.Is```、
 ```com.arsframework.annotation.Not```、```com.arsframework.annotation.Bool```注解
 
+### v1.4.6
+1. 将注解的保留周期由```SOURCE```改为```RUNTIME```
+2. 新增```.gitignore```文件
+
