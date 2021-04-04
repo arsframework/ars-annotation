@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
  *
  * @author yongqiang.wu
  */
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Option {
     /**
