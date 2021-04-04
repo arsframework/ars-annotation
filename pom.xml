@@ -157,7 +157,7 @@
                         <configuration>
                             <encoding>UTF-8</encoding>
                             <bootclasspath>
-                                ${java.home}/jre/lib/rt.jar:${java.home}/jre/lib/jce.jar:${java.home}/lib/tools.jar
+                                ${env.JAVA_HOME}/jre/lib/rt.jar:${env.JAVA_HOME}/jre/lib/jce.jar:${env.JAVA_HOME}/lib/tools.jar
                             </bootclasspath>
                         </configuration>
                     </plugin>
