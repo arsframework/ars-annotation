@@ -1,6 +1,5 @@
 # ars-annotation
-Arsframework annotation模块注解通过在代码编译期间动态修改语法树的方式增加针对方法输入参数的校验逻辑，注解本身只在编译期间有效。
-模块提供了多个用于参数校验的注解，通过这些注解可以对参数校验进行静态配置，使其在静态方法、构造方法、业务处理等不方便使用其他框架的地方编写方法参数校验更新方便。
+Arsframework annotation模块已迁移至[https://github.com/arsframework/validation]( https://github.com/arsframework/validation )。
 
 ## 1 环境依赖
 JDK1.8+
